@@ -14,19 +14,20 @@ public class BookEmbeddingService : IBookEmbeddingService
 
     public EmbeddingRequest ConstructEmbeddingRequest(Book book)
     {
-        var embeddingText =  $"Title: {book.Title};" +
-                             $"Authors: {string.Join(", ", book.Authors)};" +
-                             $"Categories: {string.Join(", ", book.Categories)};" +
-                             $"Description: {book.Description};";
-        
+        var embeddingText = $"Title: {book.Title};" +
+                            $"Authors: {string.Join(", ", book.Authors)};" +
+                            $"Categories: {string.Join(", ", book.Categories)};" +
+                            $"Description: {book.Description};";
+
         return new EmbeddingRequest
         {
             Text = embeddingText
         };
     }
 
-    public Task<IReadOnlyList<float>> GetEmbeddingsFromOpenAI(EmbeddingRequest request)
+    public async Task<IReadOnlyList<float>> GetEmbeddingsFromOpenAI(EmbeddingRequest request)
     {
-        throw new NotImplementedException();
+        var response = await _openAiCleint.GetEmbeddingsAsync(request);
+        return response.Value.Data[0].Embedding;
     }
 }

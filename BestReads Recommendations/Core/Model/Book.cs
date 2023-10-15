@@ -1,6 +1,6 @@
 ﻿namespace BestReads_Recommendations.Core;
 
-public class Book
+public class Book : IEntityWithId
 {
     public int Id { get; set; }
     public string Title { get; set; }
@@ -9,6 +9,8 @@ public class Book
     public string Description { get; set; }
     public string Publisher { get; set; }
     public DateTime PublishedDate { get; set; }
-    public string ISBN { get; set; }
+    public string Thumbnail { get; set; }
+    public string GoogleBooksId { get; set; }
+    public List<IndustryIdentifier> IndustryIdentifiers { get; set; }
     public float[] Embeddings { get; set; }
 }
