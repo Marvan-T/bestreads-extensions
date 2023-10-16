@@ -4,11 +4,16 @@ namespace BestReads_Recommendations.Core.Repository;
 
 public abstract class BaseRepository<T> : IRepository<T> where T : class, IEntityWithId
 {
-    private readonly DataContext _dataContext;
+    protected readonly DataContext _dataContext;
 
     public BaseRepository(DataContext dataContext)
     {
         _dataContext = dataContext;
+    }
+
+    public virtual void Add(T entity)
+    {
+        _dataContext.Set<T>().Add(entity);
     }
     
     public virtual async Task<T> GetByIdAsync(int id)

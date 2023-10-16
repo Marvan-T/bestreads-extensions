@@ -10,6 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 services.AddDefaultDbContext("DefaultConnection");
 services.RegisterDependencies();
+services.AddDefaultAutoMapper();
 
 
 var app = builder.Build();

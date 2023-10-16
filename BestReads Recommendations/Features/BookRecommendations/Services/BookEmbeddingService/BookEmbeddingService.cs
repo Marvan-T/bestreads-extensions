@@ -12,12 +12,12 @@ public class BookEmbeddingService : IBookEmbeddingService
         _openAiCleint = openAiCleint;
     }
 
-    public EmbeddingRequest ConstructEmbeddingRequest(Book book)
+    public EmbeddingRequest ConstructEmbeddingRequest(GetBookRecommendationsDto bookRecommendationsDto)
     {
-        var embeddingText = $"Title: {book.Title};" +
-                            $"Authors: {string.Join(", ", book.Authors)};" +
-                            $"Categories: {string.Join(", ", book.Categories)};" +
-                            $"Description: {book.Description};";
+        var embeddingText = $"Title: {bookRecommendationsDto.Title};" +
+                            $"Authors: {string.Join(", ", bookRecommendationsDto.Authors)};" +
+                            $"Categories: {string.Join(", ", bookRecommendationsDto.Categories)};" +
+                            $"Description: {bookRecommendationsDto.Description};";
 
         return new EmbeddingRequest
         {
