@@ -24,6 +24,7 @@ public class BookRecommendationService : IBookRecommendationService
     public async Task<ServiceResponse<IList<BookRecommendationDto>>> GenerateRecommendations(
         GetBookRecommendationsDto bookRecommendationsDto)
     {
+        var serviceRespones = new ServiceResponse<IList<BookRecommendationDto>>();
         var book = await _bookRepository.GetByGoogleBooksIdAsync(bookRecommendationsDto.GoogleBooksId);
         if (book is not null)
         {
@@ -39,13 +40,8 @@ public class BookRecommendationService : IBookRecommendationService
             _bookRepository.Add(book);
             await _bookRepository.SaveChangesAsync();
         }
-
         // get the recommendations by calling vector search service.
 
-
-        return null;
+        return serviceRespones;
     }
-    
-    
-    
 }

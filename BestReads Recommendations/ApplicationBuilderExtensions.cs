@@ -18,9 +18,9 @@ public static class ApplicationBuilderExtensions
         services.AddScoped<IBookRecommendationService, BookRecommendationService>();
     }
 
-    public static void AddDefaultDbContext(this IServiceCollection serviceCollection, string connectionString)
+    public static void AddDefaultDbContext(this IServiceCollection services, string connectionString)
     {
-        serviceCollection.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
+        services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
     }
 
     public static void AddDefaultAutoMapper(this IServiceCollection services)

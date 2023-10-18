@@ -4,7 +4,6 @@ namespace BestReads_Recommendations.Features.BookRecommendations.Dtos;
 
 public class GetBookRecommendationsDto
 {
-    public int Id { get; set; }
     public string Title { get; set; }
     public List<string> Authors { get; set; }
     public List<string> Categories { get; set; }

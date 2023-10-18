@@ -11,7 +11,7 @@ public class OpenAIClientService : IOpenAICleint
 
     public OpenAIClientService(IConfiguration configuration)
     {
-        _openAiClient = new OpenAIClient(configuration["OpenAIKey"]);
+        _openAiClient = new OpenAIClient(configuration["Open_AI_Key"]);
     }
 
     public Task<Response<Embeddings>> GetEmbeddingsAsync(EmbeddingRequest embeddingRequest)

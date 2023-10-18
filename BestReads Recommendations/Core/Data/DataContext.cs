@@ -4,16 +4,14 @@ namespace BestReads_Recommendations.Core.Data;
 
 public class DataContext : DbContext
 {
+    public DbSet<Book> Books { get; set; }
+    
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
-        
     }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //Todo: learn a little bit more about owned entities
-        modelBuilder.Entity<Book>().OwnsMany(b => b.IndustryIdentifiers);
+        modelBuilder.ApplyConfiguration(new BookConfiguration());
     }
-
-    public DbSet<Book> Books { get; set; }
 }
