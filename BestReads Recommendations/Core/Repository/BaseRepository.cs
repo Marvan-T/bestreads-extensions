@@ -1,28 +1,19 @@
-using BestReads_Recommendations.Core.Data;
-
 namespace BestReads_Recommendations.Core.Repository;
 
 public abstract class BaseRepository<T> : IRepository<T> where T : class, IEntityWithId
 {
-    protected readonly DataContext _dataContext;
-
-    public BaseRepository(DataContext dataContext)
+    public void Add(T entity)
     {
-        _dataContext = dataContext;
+        throw new NotImplementedException();
     }
 
-    public virtual void Add(T entity)
+    public Task<T> GetByIdAsync(int id)
     {
-        _dataContext.Set<T>().Add(entity);
-    }
-    
-    public virtual async Task<T> GetByIdAsync(int id)
-    {
-        return await _dataContext.Set<T>().FindAsync(id);
+        throw new NotImplementedException();
     }
 
-    public virtual async Task SaveChangesAsync()
+    public Task SaveChangesAsync()
     {
-        await _dataContext.SaveChangesAsync();
+        throw new NotImplementedException();
     }
 }

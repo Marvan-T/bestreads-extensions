@@ -1,13 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using Newtonsoft.Json;
 
 namespace BestReads_Recommendations.Core;
 
 public class Book : IEntityWithId
 {
+    public int Id { get; set; }
     public string Title { get; set; }
-    public string AuthorsJson { get; set; }
-    public string CategoriesJson { get; set; }
+    public string? AuthorsJson { get; set; }
+    public string? CategoriesJson { get; set; }
     public string Description { get; set; }
     public string Publisher { get; set; }
     public DateTime PublishedDate { get; set; }
@@ -15,15 +17,14 @@ public class Book : IEntityWithId
     public string GoogleBooksId { get; set; }
     public string? IndustryIdentifierISBN13 { get; set; }
     public string? IndustryIdentifierISBN10 { get; set; }
-    public byte[] EmbeddingsBinary { get; set; }
-
+    public string EmbeddingsAsJson { get; set; } 
     [NotMapped]
     public float[] Embeddings
     {
-        get => ToFloatArray(EmbeddingsBinary);
-        set => EmbeddingsBinary = ToByteArray(value);
+        get => JsonToFloatArray(EmbeddingsAsJson);
+        set => EmbeddingsAsJson = FloatArrayToJson(value);
     }
-
+    
     [NotMapped]
     public List<string>? Authors
     {
@@ -38,19 +39,16 @@ public class Book : IEntityWithId
         set => CategoriesJson = JsonConvert.SerializeObject(value);
     }
 
-    public int Id { get; set; }
-
-    private static float[] ToFloatArray(byte[] byteArray)
+    private static float[] JsonToFloatArray(string json)
     {
-        var floatArray = new float[byteArray.Length / sizeof(float)];
-        Buffer.BlockCopy(byteArray, 0, floatArray, 0, byteArray.Length);
-        return floatArray;
+        var stringArray = JsonConvert.DeserializeObject<string[]>(json);
+        return Array.ConvertAll(stringArray, s => float.Parse(s, CultureInfo.InvariantCulture));
     }
 
-    private static byte[] ToByteArray(float[] floatArray)
+    private static string FloatArrayToJson(float[] floatArray)
     {
-        var byteArray = new byte[floatArray.Length * sizeof(float)];
-        Buffer.BlockCopy(floatArray, 0, byteArray, 0, byteArray.Length);
-        return byteArray;
+        var stringArray = Array.ConvertAll(floatArray, f => f.ToString(CultureInfo.InvariantCulture));
+        return JsonConvert.SerializeObject(stringArray);
     }
+    
 }
