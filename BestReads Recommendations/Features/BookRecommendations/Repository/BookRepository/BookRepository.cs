@@ -1,12 +1,26 @@
 ﻿using BestReads_Recommendations.Core;
-using BestReads_Recommendations.Core.Repository;
+using BestReads_Recommendations.Infrastructure.Data;
+using MongoDB.Driver;
 
 namespace BestReads_Recommendations.Features.BookRecommendations.Repository;
 
-public class BookRepository : BaseRepository<Book>, IBookRepository
+public class BookRepository : IBookRepository
 {
-    public Task<Book?> GetByGoogleBooksIdAsync(string googleBooksId)
+    private readonly IMongoCollection<Book> _books;
+
+    public BookRepository(MongoDbContext mongoDbContext)
     {
-        throw new NotImplementedException();
+        _books = mongoDbContext.Books;
+    }
+
+    public Task<Book> GetByGoogleBooksIdAsync(string googleBooksId)
+    {
+        var filter = Builders<Book>.Filter.Eq(b => b.GoogleBooksId, googleBooksId);
+        return _books.Find(filter).FirstOrDefaultAsync();
+    }
+
+    public Task StoreBookAsync(Book book)
+    {
+        return _books.InsertOneAsync(book);
     }
 }

@@ -37,8 +37,7 @@ public class BookRecommendationService : IBookRecommendationService
             var embedding = await _bookEmbeddingService.GetEmbeddingsFromOpenAI(embeddingRequest);
             book = _mapper.Map<Book>(bookRecommendationsDto);
             book.Embeddings = embedding.ToArray();
-            _bookRepository.Add(book);
-            await _bookRepository.SaveChangesAsync();
+            await _bookRepository.StoreBookAsync(book);
         }
         // get the recommendations by calling vector search service.
 

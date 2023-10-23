@@ -1,9 +1,9 @@
 ﻿using BestReads_Recommendations.Core;
-using BestReads_Recommendations.Core.Repository;
 
 namespace BestReads_Recommendations.Features.BookRecommendations.Repository;
 
-public interface IBookRepository : IRepository<Book>
+public interface IBookRepository
 {
-    Task<Book?> GetByGoogleBooksIdAsync(string googleBooksId);
+    Task<Book> GetByGoogleBooksIdAsync(string googleBooksId);
+    Task StoreBookAsync(Book book);
 }
