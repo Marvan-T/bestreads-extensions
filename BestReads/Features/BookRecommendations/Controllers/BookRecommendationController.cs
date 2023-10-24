@@ -17,11 +17,12 @@ public class BookRecommendationController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ServiceResponse<IList<BookRecommendationDto>>>> GetBookRecommendations(
+    public async Task<ActionResult<ServiceResponse<IList<BookRecommendationDto>>>> GenerateBookRecommendations(
         GetBookRecommendationsDto bookRecommendationsDto)
 
     {
-        await _bookRecommendationService.GenerateRecommendations(bookRecommendationsDto);
-        return Ok(null);
+        var response = await _bookRecommendationService.GenerateRecommendations(bookRecommendationsDto);
+        if (!response.Success) return BadRequest(response);
+        return Ok(response);
     }
 }

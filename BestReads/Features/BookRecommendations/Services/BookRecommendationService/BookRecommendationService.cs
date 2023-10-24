@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BestReads.Core;
+using BestReads.Core.Constants;
 using BestReads.Core.Responses;
 using BestReads.Features.BookRecommendations.Dtos;
 using BestReads.Features.BookRecommendations.Repository;
@@ -11,8 +12,8 @@ public class BookRecommendationService : IBookRecommendationService
 {
     private readonly IBookEmbeddingService _bookEmbeddingService;
     private readonly IBookRepository _bookRepository;
-    private readonly IMapper _mapper;
     private readonly ILogger<BookRecommendationService> _logger;
+    private readonly IMapper _mapper;
 
     public BookRecommendationService(IBookRepository bookRepository, IBookEmbeddingService bookEmbeddingService,
         IMapper mapper, ILogger<BookRecommendationService> logger)
@@ -32,24 +33,21 @@ public class BookRecommendationService : IBookRecommendationService
         {
             var book = await _bookRepository.GetByGoogleBooksIdAsync(bookRecommendationsDto.GoogleBooksId);
 
-            if (book is null)
-            {
-                book = await GetAndStoreEmbeddingsForBookAsync(bookRecommendationsDto);
-            }
+            if (book is null) book = await GetAndStoreEmbeddingsForBookAsync(bookRecommendationsDto);
 
             //Todo: obtain recommendations from Vector Search (bestreads-extensions #5)
-
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while generating recommendations for {GoogleBooksId}", bookRecommendationsDto.GoogleBooksId);
+            _logger.LogError(ex, "Error while generating recommendations for {GoogleBooksId}",
+                bookRecommendationsDto.GoogleBooksId);
             serviceResponse.Success = false;
-            serviceResponse.AddError(ex.Message);
+            serviceResponse.AddError(ErrorCodes.Feature_BookRecommendations.GenerateRecommendationsError, ex.Message);
         }
-        
+
         return serviceResponse;
     }
-    
+
     private async Task<Book> GetAndStoreEmbeddingsForBookAsync(GetBookRecommendationsDto bookRecommendationsDto)
     {
         var embeddingRequest = _bookEmbeddingService.ConstructEmbeddingRequest(bookRecommendationsDto);
