@@ -12,35 +12,53 @@ public class BookRecommendationService : IBookRecommendationService
     private readonly IBookEmbeddingService _bookEmbeddingService;
     private readonly IBookRepository _bookRepository;
     private readonly IMapper _mapper;
+    private readonly ILogger<BookRecommendationService> _logger;
 
     public BookRecommendationService(IBookRepository bookRepository, IBookEmbeddingService bookEmbeddingService,
-        IMapper mapper)
+        IMapper mapper, ILogger<BookRecommendationService> logger)
     {
         _bookRepository = bookRepository;
         _bookEmbeddingService = bookEmbeddingService;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public async Task<ServiceResponse<IList<BookRecommendationDto>>> GenerateRecommendations(
         GetBookRecommendationsDto bookRecommendationsDto)
     {
-        var serviceRespones = new ServiceResponse<IList<BookRecommendationDto>>();
-        var book = await _bookRepository.GetByGoogleBooksIdAsync(bookRecommendationsDto.GoogleBooksId);
-        if (book is not null)
-        {
-            // obtain the book (incl embeddings) from DB 
-        }
-        else
-        {
-            // construct and save embedding request
-            var embeddingRequest = _bookEmbeddingService.ConstructEmbeddingRequest(bookRecommendationsDto);
-            var embedding = await _bookEmbeddingService.GetEmbeddingsFromOpenAI(embeddingRequest);
-            book = _mapper.Map<Book>(bookRecommendationsDto);
-            book.Embeddings = embedding.ToArray();
-            await _bookRepository.StoreBookAsync(book);
-        }
-        // get the recommendations by calling vector search service.
+        var serviceResponse = new ServiceResponse<IList<BookRecommendationDto>>();
 
-        return serviceRespones;
+        try
+        {
+            var book = await _bookRepository.GetByGoogleBooksIdAsync(bookRecommendationsDto.GoogleBooksId);
+
+            if (book is null)
+            {
+                book = await GetAndStoreEmbeddingsForBookAsync(bookRecommendationsDto);
+            }
+
+            //Todo: obtain recommendations from Vector Search (bestreads-extensions #5)
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while generating recommendations for {GoogleBooksId}", bookRecommendationsDto.GoogleBooksId);
+            serviceResponse.Success = false;
+            serviceResponse.AddError(ex.Message);
+        }
+        
+        return serviceResponse;
+    }
+    
+    private async Task<Book> GetAndStoreEmbeddingsForBookAsync(GetBookRecommendationsDto bookRecommendationsDto)
+    {
+        var embeddingRequest = _bookEmbeddingService.ConstructEmbeddingRequest(bookRecommendationsDto);
+        var embedding = await _bookEmbeddingService.GetEmbeddingsFromOpenAI(embeddingRequest);
+
+        var book = _mapper.Map<Book>(bookRecommendationsDto);
+        book.Embeddings = embedding.ToArray();
+
+        await _bookRepository.StoreBookAsync(book);
+        return book;
     }
 }
