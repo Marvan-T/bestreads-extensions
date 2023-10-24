@@ -7,11 +7,11 @@ namespace BestReads.Features.BookRecommendations.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BookRecommendationController : ControllerBase
+public class BookRecommendationsController : ControllerBase
 {
     private readonly IBookRecommendationService _bookRecommendationService;
 
-    public BookRecommendationController(IBookRecommendationService bookRecommendationService)
+    public BookRecommendationsController(IBookRecommendationService bookRecommendationService)
     {
         _bookRecommendationService = bookRecommendationService;
     }
