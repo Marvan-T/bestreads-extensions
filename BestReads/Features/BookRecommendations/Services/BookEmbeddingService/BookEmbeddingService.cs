@@ -27,7 +27,6 @@ public class BookEmbeddingService : IBookEmbeddingService
 
     public async Task<IReadOnlyList<float>> GetEmbeddingsFromOpenAI(EmbeddingRequest request)
     {
-        var response = await _openAiCleint.GetEmbeddingsAsync(request);
-        return response.Value.Data[0].Embedding;
+        return await _openAiCleint.GetEmbeddingsAsync(request);
     }
 }

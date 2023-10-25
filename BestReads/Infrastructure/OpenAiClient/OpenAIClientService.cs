@@ -1,7 +1,7 @@
-﻿using Azure;
-using Azure.AI.OpenAI;
+﻿using Azure.AI.OpenAI;
 using BestReads.Core;
 using BestReads.Features.BookRecommendations.Dtos;
+using BestReads.Features.BookRecommendations.Exceptions;
 
 namespace BestReads.Infrastructure;
 
@@ -14,8 +14,14 @@ public class OpenAIClientService : IOpenAICleint
         _openAiClient = new OpenAIClient(configuration["Open_AI_Key"]);
     }
 
-    public Task<Response<Embeddings>> GetEmbeddingsAsync(EmbeddingRequest embeddingRequest)
+    public async Task<IReadOnlyList<float>> GetEmbeddingsAsync(EmbeddingRequest embeddingRequest)
     {
-        return _openAiClient.GetEmbeddingsAsync(embeddingRequest.Model, new EmbeddingsOptions(embeddingRequest.Text));
+        var response =
+            await _openAiClient.GetEmbeddingsAsync(embeddingRequest.Model,
+                new EmbeddingsOptions(embeddingRequest.Text));
+
+        if (response.Value.Data.Any()) return response.Value.Data[0].Embedding;
+
+        throw new EmbeddingRequestException(embeddingRequest);
     }
 }
