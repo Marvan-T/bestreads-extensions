@@ -17,7 +17,7 @@ public class BookRecommendationsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ServiceResponse<IList<BookRecommendationDto>>>> GenerateBookRecommendations(
+    public async Task<ActionResult<ServiceResponse<List<BookRecommendationDto>>>> GenerateBookRecommendations(
         GetBookRecommendationsDto bookRecommendationsDto)
 
     {

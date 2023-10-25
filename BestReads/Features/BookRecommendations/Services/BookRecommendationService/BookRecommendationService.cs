@@ -24,10 +24,10 @@ public class BookRecommendationService : IBookRecommendationService
         _logger = logger;
     }
 
-    public async Task<ServiceResponse<IList<BookRecommendationDto>>> GenerateRecommendations(
+    public async Task<ServiceResponse<List<BookRecommendationDto>>> GenerateRecommendations(
         GetBookRecommendationsDto bookRecommendationsDto)
     {
-        var serviceResponse = new ServiceResponse<IList<BookRecommendationDto>>();
+        var serviceResponse = new ServiceResponse<List<BookRecommendationDto>>();
 
         try
         {

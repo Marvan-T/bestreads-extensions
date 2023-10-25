@@ -15,7 +15,7 @@ public class ServiceResponse<T>
     /// <summary>
     ///     Map of error codes/types to error messages.
     /// </summary>
-    public Dictionary<string, string> Errors { get; set; } = new();
+    public Dictionary<string, string>? Errors { get; set; } = new();
 
 
     /// <summary>
