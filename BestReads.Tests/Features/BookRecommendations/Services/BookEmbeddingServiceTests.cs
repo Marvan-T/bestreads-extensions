@@ -1,12 +1,7 @@
-﻿using Azure;
-using Azure.AI.OpenAI;
-using BestReads.Core;
+﻿using BestReads.Core;
 using BestReads.Features.BookRecommendations.Dtos;
-using BestReads.Features.BookRecommendations.Exceptions;
 using BestReads.Features.BookRecommendations.Services.BookEmbeddingService;
 using BestReads.Tests.Fakers;
-using FluentAssertions;
-using Moq;
 
 namespace BestReads.Tests.Features.BookRecommendations.Services;
 

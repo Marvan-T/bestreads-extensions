@@ -3,7 +3,6 @@ using BestReads.Features.BookRecommendations.Dtos;
 using BestReads.Features.BookRecommendations.Services.BookRecommendationService;
 using BestReads.Tests.Fakers;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using static BestReads.Tests.ControllerTestHelper;
 
 namespace BestReads.Tests.Features.BookRecommendations.Controllers;
