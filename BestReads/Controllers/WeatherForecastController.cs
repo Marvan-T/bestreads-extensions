@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace BestReads_Recommendations.Controllers;
+namespace BestReads.Controllers;
 
 [ApiController]
 [Route("[controller]")]

@@ -1,4 +1,4 @@
-namespace BestReads_Recommendations;
+namespace BestReads;
 
 public class WeatherForecast
 {
