@@ -13,7 +13,7 @@ public class BookRepository : IBookRepository
         _books = mongoDbContext.Books;
     }
 
-    public Task<Book> GetByGoogleBooksIdAsync(string googleBooksId)
+    public Task<Book>? GetByGoogleBooksIdAsync(string googleBooksId)
     {
         var filter = Builders<Book>.Filter.Eq(b => b.GoogleBooksId, googleBooksId);
         return _books.Find(filter).FirstOrDefaultAsync();
