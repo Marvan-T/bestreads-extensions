@@ -34,29 +34,27 @@ public class BookRecommendationService : IBookRecommendationService
 
         try
         {
-            var book = await _bookRepository.GetByGoogleBooksIdAsync(bookRecommendationsDto.GoogleBooksId);
-            if (book is null) book = await GetAndStoreEmbeddingsForBookAsync(bookRecommendationsDto);
-            serviceResponse.Data = await GetRecommendations(book);
+            var book = await GetOrStoreBookWithEmbeddingsAsync(bookRecommendationsDto);
+            serviceResponse.Data = await GetRecommendationsAsync(book);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while generating recommendations for {GoogleBooksId}",
-                bookRecommendationsDto.GoogleBooksId);
-            serviceResponse.Success = false;
-            serviceResponse.AddError(ErrorCodes.Feature_BookRecommendations.GenerateRecommendationsError, ex.Message);
+            HandleException(serviceResponse, bookRecommendationsDto.GoogleBooksId, ex);
         }
 
         return serviceResponse;
     }
 
-    private async Task<List<BookRecommendationDto>> GetRecommendations(Book book)
+    private async Task<Book> GetOrStoreBookWithEmbeddingsAsync(GetBookRecommendationsDto bookRecommendationsDto)
     {
-        var recommendations =
-            await _bookSearchService.GetNearestNeighbors(book); //Returns a list of BookRecommendationDto
-        return recommendations.GroupBy(r => r.Title)
-            .Select(g => g.First())
-            .Take(5)
-            .ToList();
+        var book = await _bookRepository.GetByGoogleBooksIdAsync(bookRecommendationsDto.GoogleBooksId);
+        return book ?? await GetAndStoreEmbeddingsForBookAsync(bookRecommendationsDto);
+    }
+
+    private async Task<List<BookRecommendationDto>> GetRecommendationsAsync(Book book)
+    {
+        var recommendations = await _bookSearchService.GetNearestNeighbors(book);
+        return recommendations.GroupBy(r => r.Title).Select(g => g.First()).Take(5).ToList();
     }
 
     private async Task<Book> GetAndStoreEmbeddingsForBookAsync(GetBookRecommendationsDto bookRecommendationsDto)
@@ -69,5 +67,13 @@ public class BookRecommendationService : IBookRecommendationService
 
         await _bookRepository.StoreBookAsync(book);
         return book;
+    }
+
+    private void HandleException(ServiceResponse<List<BookRecommendationDto>> serviceResponse, string googleBooksId,
+        Exception ex)
+    {
+        _logger.LogError(ex, "Error while generating recommendations for {GoogleBooksId}", googleBooksId);
+        serviceResponse.Success = false;
+        serviceResponse.AddError(ErrorCodes.Feature_BookRecommendations.GenerateRecommendationsError, ex.Message);
     }
 }
