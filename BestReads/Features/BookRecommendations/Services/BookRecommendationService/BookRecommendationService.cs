@@ -51,7 +51,12 @@ public class BookRecommendationService : IBookRecommendationService
 
     private async Task<List<BookRecommendationDto>> GetRecommendations(Book book)
     {
-        return await _bookSearchService.GetNearestNeighbors(book);
+        var recommendations =
+            await _bookSearchService.GetNearestNeighbors(book); //Returns a list of BookRecommendationDto
+        return recommendations.GroupBy(r => r.Title)
+            .Select(g => g.First())
+            .Take(5)
+            .ToList();
     }
 
     private async Task<Book> GetAndStoreEmbeddingsForBookAsync(GetBookRecommendationsDto bookRecommendationsDto)

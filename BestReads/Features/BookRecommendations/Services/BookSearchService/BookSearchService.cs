@@ -22,7 +22,5 @@ public class BookSearchService : IBookSearchService
             {
                 "doc_id, GoogleBooksId, Title, Authors, Categories, Description, Publisher, PublishedDate, Thumbnail, IndustryIdentifiers"
             });
-
-        // get only the first 5 (some titles are duplicates)
     }
 }
