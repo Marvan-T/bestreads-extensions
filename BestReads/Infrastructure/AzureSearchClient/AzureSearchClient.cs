@@ -31,7 +31,7 @@ public class AzureSearchClient : IAzureSearchClient
         {
             VectorQueries =
             {
-                new RawVectorQuery { Vector = queryEmbeddings, KNearestNeighborsCount = 5, Fields = { vectorField } }
+                new RawVectorQuery { Vector = queryEmbeddings, KNearestNeighborsCount = 8, Fields = { vectorField } }
             },
             Filter = filter
         };
