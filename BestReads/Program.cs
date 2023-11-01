@@ -15,6 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 services.RegisterDatabaseDependencies();
+services.RegisterInfrastructureDependencies();
 services.RegisterDependencies();
 services.AddDefaultAutoMapper();
 
