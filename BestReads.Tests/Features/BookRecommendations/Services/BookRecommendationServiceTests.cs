@@ -52,6 +52,7 @@ public class BookRecommendationServiceTests
         // Assert
         result.Success.Should().BeTrue();
         result.Data.Should().BeEquivalentTo(recommendations);
+        result.Errors.Should().BeEmpty();
         _mockBookEmbeddingService.Verify(
             embeddingService => embeddingService.GetEmbeddingsFromOpenAI(It.IsAny<EmbeddingRequest>()), Times.Never());
         _mockBookEmbeddingService.Verify(
