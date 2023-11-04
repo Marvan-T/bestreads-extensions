@@ -57,6 +57,6 @@ jobs:
       - name: Build and push dotnet image
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: ./BestReads
           push: true 
           tags: augmart/bestreads-extensions
