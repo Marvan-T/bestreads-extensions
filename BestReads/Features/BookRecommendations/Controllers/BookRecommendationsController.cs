@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BestReads.Features.BookRecommendations.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/extensions/[controller]")]
 public class BookRecommendationsController : ControllerBase
 {
     private readonly IBookRecommendationService _bookRecommendationService;
