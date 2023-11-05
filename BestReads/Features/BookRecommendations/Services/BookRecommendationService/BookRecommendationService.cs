@@ -35,6 +35,7 @@ public class BookRecommendationService : IBookRecommendationService
         try
         {
             var book = await GetOrStoreBookWithEmbeddingsAsync(bookRecommendationsDto);
+            _logger.LogInformation($"Embeddings obtained for {book.Title}");
             serviceResponse.Data = await GetRecommendationsAsync(book);
         }
         catch (Exception ex)
@@ -53,6 +54,7 @@ public class BookRecommendationService : IBookRecommendationService
 
     private async Task<List<BookRecommendationDto>> GetRecommendationsAsync(Book book)
     {
+        _logger.LogInformation($"Generating Recommendations for {book.Title}");
         var recommendations = await _bookSearchService.GetNearestNeighbors(book);
         return recommendations.GroupBy(r => r.Title).Select(g => g.First()).Take(5).ToList();
     }
