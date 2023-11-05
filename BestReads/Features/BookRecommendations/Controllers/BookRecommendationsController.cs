@@ -10,10 +10,13 @@ namespace BestReads.Features.BookRecommendations.Controllers;
 public class BookRecommendationsController : ControllerBase
 {
     private readonly IBookRecommendationService _bookRecommendationService;
+    private readonly ILogger<BookRecommendationsController> _logger;
 
-    public BookRecommendationsController(IBookRecommendationService bookRecommendationService)
+    public BookRecommendationsController(IBookRecommendationService bookRecommendationService,
+        ILogger<BookRecommendationsController> logger)
     {
         _bookRecommendationService = bookRecommendationService;
+        _logger = logger;
     }
 
     [HttpPost]
@@ -21,6 +24,7 @@ public class BookRecommendationsController : ControllerBase
         GetBookRecommendationsDto bookRecommendationsDto)
 
     {
+        _logger.LogInformation($"Request: {bookRecommendationsDto.Title}");
         var response = await _bookRecommendationService.GenerateRecommendations(bookRecommendationsDto);
         if (!response.Success) return BadRequest(response);
         return Ok(response);
