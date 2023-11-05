@@ -3,6 +3,7 @@ using BestReads.Features.BookRecommendations.Dtos;
 using BestReads.Features.BookRecommendations.Services.BookRecommendationService;
 using BestReads.Tests.Fakers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using static BestReads.Tests.ControllerTestHelper;
 
 namespace BestReads.Tests.Features.BookRecommendations.Controllers;
@@ -11,11 +12,13 @@ public class BookRecommendationsControllerTests
 {
     private readonly BookRecommendationsController _controller;
     private readonly Mock<IBookRecommendationService> _mockService;
+    private readonly Mock<ILogger<BookRecommendationsController>> _mockLogger;
 
     public BookRecommendationsControllerTests()
     {
         _mockService = new Mock<IBookRecommendationService>();
-        _controller = new BookRecommendationsController(_mockService.Object);
+        _mockLogger = new Mock<ILogger<BookRecommendationsController>>();
+        _controller = new BookRecommendationsController(_mockService.Object, _mockLogger.Object);
     }
 
     [Fact]
