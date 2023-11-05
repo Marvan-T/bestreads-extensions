@@ -31,12 +31,17 @@ public class BookRecommendationService : IBookRecommendationService
         GetBookRecommendationsDto bookRecommendationsDto)
     {
         var serviceResponse = new ServiceResponse<List<BookRecommendationDto>>();
+        _logger.LogInformation("Starting to generate book recommendations for GoogleBooksId: {GoogleBooksId}",
+            bookRecommendationsDto.GoogleBooksId);
 
         try
         {
             var book = await GetOrStoreBookWithEmbeddingsAsync(bookRecommendationsDto);
-            _logger.LogInformation($"Embeddings obtained for {book.Title}");
+            _logger.LogInformation("Book retrieved or stored with embeddings for GoogleBooksId: {GoogleBooksId}",
+                book.GoogleBooksId);
+            
             serviceResponse.Data = await GetRecommendationsAsync(book);
+            _logger.LogInformation("Recommendations generated for GoogleBooksId: {GoogleBooksId}", book.GoogleBooksId);
         }
         catch (Exception ex)
         {
@@ -48,8 +53,26 @@ public class BookRecommendationService : IBookRecommendationService
 
     private async Task<Book> GetOrStoreBookWithEmbeddingsAsync(GetBookRecommendationsDto bookRecommendationsDto)
     {
+        _logger.LogInformation("Attempting to get book by GoogleBooksId: {GoogleBooksId}",
+            bookRecommendationsDto.GoogleBooksId);
         var book = await _bookRepository.GetByGoogleBooksIdAsync(bookRecommendationsDto.GoogleBooksId);
-        return book ?? await GetAndStoreEmbeddingsForBookAsync(bookRecommendationsDto);
+
+        if (book != null)
+        {
+            _logger.LogInformation("Found book with GoogleBooksId: {GoogleBooksId} in repository",
+                bookRecommendationsDto.GoogleBooksId);
+        }
+        else
+        {
+            _logger.LogWarning(
+                "Book with GoogleBooksId: {GoogleBooksId} not found in repository. Attempting to store with embeddings.",
+                bookRecommendationsDto.GoogleBooksId);
+            book = await GetAndStoreEmbeddingsForBookAsync(bookRecommendationsDto);
+            _logger.LogInformation("Stored book with GoogleBooksId: {GoogleBooksId} and embeddings",
+                bookRecommendationsDto.GoogleBooksId);
+        }
+
+        return book;
     }
 
     private async Task<List<BookRecommendationDto>> GetRecommendationsAsync(Book book)
