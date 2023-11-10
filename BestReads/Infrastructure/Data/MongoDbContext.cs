@@ -12,5 +12,5 @@ public class MongoDbContext
         _database = mongoClient.GetDatabase(mongoDbSettings.DatabaseName);
     }
 
-    public IMongoCollection<Book> Books => _database.GetCollection<Book>("Books");
+    public IMongoCollection<Book> Books => _database.GetCollection<Book>("books");
 }
