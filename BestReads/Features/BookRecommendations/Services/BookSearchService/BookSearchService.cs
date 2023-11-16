@@ -15,7 +15,7 @@ public class BookSearchService : IBookSearchService
 
     public async Task<List<BookRecommendationDto>> GetNearestNeighbors(Book book)
     {
-        var filter = $"GoogleBooksId ne \'{book.GoogleBooksId}\'";
+        var filter = $"GoogleBooksId ne '{book.GoogleBooksId}' and Title ne '{book.Title}'";
         return await _azureSearchClient.SingleVectorSearch<BookRecommendationDto>(book.Embeddings,
             "Embeddings", filter,
             new List<string>

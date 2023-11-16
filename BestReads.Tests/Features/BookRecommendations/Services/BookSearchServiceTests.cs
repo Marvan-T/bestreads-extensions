@@ -38,7 +38,7 @@ public class BookSearchServiceTests
         result.Should().NotBeNull();
         result.Should().BeEquivalentTo(expectedRecommendations);
 
-        var expectedFilter = $"GoogleBooksId ne '{book.GoogleBooksId}'";
+        var expectedFilter = $"GoogleBooksId ne '{book.GoogleBooksId}' and Title ne '{book.Title}'";
         var expectedSelectOptions = new List<string>
         {
             "doc_id, GoogleBooksId, Title, Authors, Categories, Description, Publisher, PublishedDate, Thumbnail, IndustryIdentifiers"
