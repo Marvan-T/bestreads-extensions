@@ -11,4 +11,4 @@ This project serves as an extension to enhance the final year group project I wa
 - Implemented a new recommendations layer utilizing embeddings to identify similar items (books).
 - An overview of the process is illustrated in the workflow diagram below.
 
-<img src="./Images/Flowchart-Recommendations.png">
+<img src="./Images/Flowchart-Recommendations.png" width="90%">
