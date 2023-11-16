@@ -2,7 +2,7 @@
 
 # Best Reads Extensions
 
-This project serves as an extension to enhance the final year group project I was a part of at the university.
+This project serves as an extension to improve the final year group project I was a part of at the university.
 
 ## New Features Introduced
 
