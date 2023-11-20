@@ -22,10 +22,11 @@ public class BookRecommendationsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ServiceResponse<List<BookRecommendationDto>>>> GenerateBookRecommendations(
         GetBookRecommendationsDto bookRecommendationsDto)
-
     {
-        var response = await _bookRecommendationService.GenerateRecommendations(bookRecommendationsDto);
-        if (!response.Result.IsSuccess) return BadRequest(response);
-        return Ok(response);
+        var recommendationsResult = await _bookRecommendationService.GenerateRecommendations(bookRecommendationsDto);
+
+        return recommendationsResult.Match(
+            ServiceResponse<List<BookRecommendationDto>>.Success,
+            ServiceResponse<List<BookRecommendationDto>>.Failure);
     }
 }

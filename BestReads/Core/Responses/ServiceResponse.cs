@@ -10,9 +10,7 @@ public class ServiceResponse<T>
     }
 
     public Result<T> Result { get; }
-
-    public T Data => Result.Value;
-
+    
     public static ServiceResponse<T> Success(T data)
     {
         return new ServiceResponse<T>(Result<T>.Success(data));

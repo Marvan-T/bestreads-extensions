@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BestReads.Core;
-using BestReads.Core.Responses;
 using BestReads.Core.Utilities;
 using BestReads.Features.BookRecommendations.Dtos;
 using BestReads.Features.BookRecommendations.Errors;
@@ -28,23 +27,19 @@ public class BookRecommendationService : IBookRecommendationService
         _bookSearchService = bookSearchService;
     }
 
-    public async Task<ServiceResponse<List<BookRecommendationDto>>> GenerateRecommendations(
+    public async Task<Result<List<BookRecommendationDto>>> GenerateRecommendations(
         GetBookRecommendationsDto bookRecommendationsDto)
     {
         try
         {
             var bookResult = await GetOrStoreBookWithEmbeddingsAsync(bookRecommendationsDto);
-            if (!bookResult.IsSuccess) return ServiceResponse<List<BookRecommendationDto>>.Failure(bookResult.Error);
+            if (!bookResult.IsSuccess) return Result<List<BookRecommendationDto>>.Failure(bookResult.Error);
 
-            var recommendationsResult = await GetRecommendationsAsync(bookResult.Value);
-
-            return !recommendationsResult.IsSuccess
-                ? ServiceResponse<List<BookRecommendationDto>>.Failure(recommendationsResult.Error)
-                : ServiceResponse<List<BookRecommendationDto>>.Success(recommendationsResult.Value);
+            return await GetRecommendationsAsync(bookResult.Value);
         }
         catch (Exception ex)
         {
-            return ServiceResponse<List<BookRecommendationDto>>.Failure(new Error("UnexpectedError", ex.Message));
+            return Result<List<BookRecommendationDto>>.Failure(new Error("UnexpectedError", ex.Message));
         }
     }
 
