@@ -9,6 +9,6 @@ public static class ResultExtensions
         Func<T, ServiceResponse<T>> onSuccess,
         Func<Error, ServiceResponse<T>> onFailure)
     {
-        return result.IsSuccess ? onSuccess(result.Value) : onFailure(result.Error);
+        return result.IsSuccess ? onSuccess(result.Data) : onFailure(result.Error);
     }
 }

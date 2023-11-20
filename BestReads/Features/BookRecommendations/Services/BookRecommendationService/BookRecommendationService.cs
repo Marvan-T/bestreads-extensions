@@ -35,7 +35,7 @@ public class BookRecommendationService : IBookRecommendationService
             var bookResult = await GetOrStoreBookWithEmbeddingsAsync(bookRecommendationsDto);
             if (!bookResult.IsSuccess) return Result<List<BookRecommendationDto>>.Failure(bookResult.Error);
 
-            return await GetRecommendationsAsync(bookResult.Value);
+            return await GetRecommendationsAsync(bookResult.Data);
         }
         catch (Exception ex)
         {
@@ -63,7 +63,7 @@ public class BookRecommendationService : IBookRecommendationService
         if (!recommendationsResult.IsSuccess)
             return Result<List<BookRecommendationDto>>.Failure(recommendationsResult.Error);
 
-        var filteredRecommendations = recommendationsResult.Value.GroupBy(r => r.Title)
+        var filteredRecommendations = recommendationsResult.Data.GroupBy(r => r.Title)
             .Select(g => g.First())
             .Take(5)
             .ToList();
@@ -77,7 +77,7 @@ public class BookRecommendationService : IBookRecommendationService
 
         if (!embeddingRequestResult.IsSuccess) return Result<Book>.Failure(embeddingRequestResult.Error);
 
-        var embedding = await _bookEmbeddingService.GetEmbeddingsFromOpenAI(embeddingRequestResult.Value);
+        var embedding = await _bookEmbeddingService.GetEmbeddingsFromOpenAI(embeddingRequestResult.Data);
         var book = _mapper.Map<Book>(bookRecommendationsDto);
         book.Embeddings = embedding.ToArray();
 
