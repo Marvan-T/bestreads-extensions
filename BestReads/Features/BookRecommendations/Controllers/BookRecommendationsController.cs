@@ -24,10 +24,8 @@ public class BookRecommendationsController : ControllerBase
         GetBookRecommendationsDto bookRecommendationsDto)
 
     {
-        _logger.LogInformation($"Request: {bookRecommendationsDto.Title}");
-        _logger.LogInformation("From Controller GoogleBooksId: {GoogleBooksId}", bookRecommendationsDto.GoogleBooksId);
         var response = await _bookRecommendationService.GenerateRecommendations(bookRecommendationsDto);
-        if (!response.Success) return BadRequest(response);
+        if (!response.Result.IsSuccess) return BadRequest(response);
         return Ok(response);
     }
 }

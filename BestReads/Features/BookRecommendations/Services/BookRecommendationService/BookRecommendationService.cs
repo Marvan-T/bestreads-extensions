@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using BestReads.Core;
-using BestReads.Core.Constants;
 using BestReads.Core.Responses;
+using BestReads.Core.Utilities;
 using BestReads.Features.BookRecommendations.Dtos;
+using BestReads.Features.BookRecommendations.Errors;
 using BestReads.Features.BookRecommendations.Repository;
 using BestReads.Features.BookRecommendations.Services.BookEmbeddingService;
 using BestReads.Features.BookRecommendations.Services.BookSearchService;
@@ -30,75 +31,62 @@ public class BookRecommendationService : IBookRecommendationService
     public async Task<ServiceResponse<List<BookRecommendationDto>>> GenerateRecommendations(
         GetBookRecommendationsDto bookRecommendationsDto)
     {
-        var serviceResponse = new ServiceResponse<List<BookRecommendationDto>>();
-        _logger.LogInformation("Starting to generate book recommendations for GoogleBooksId: {GoogleBooksId}",
-            bookRecommendationsDto.GoogleBooksId);
-
         try
         {
-            var book = await GetOrStoreBookWithEmbeddingsAsync(bookRecommendationsDto);
-            _logger.LogInformation("Book retrieved or stored with embeddings for GoogleBooksId: {GoogleBooksId}",
-                book.GoogleBooksId);
-            
-            serviceResponse.Data = await GetRecommendationsAsync(book);
-            _logger.LogInformation("Recommendations generated for GoogleBooksId: {GoogleBooksId}", book.GoogleBooksId);
+            var bookResult = await GetOrStoreBookWithEmbeddingsAsync(bookRecommendationsDto);
+            if (!bookResult.IsSuccess) return ServiceResponse<List<BookRecommendationDto>>.Failure(bookResult.Error);
+
+            var recommendationsResult = await GetRecommendationsAsync(bookResult.Value);
+
+            return !recommendationsResult.IsSuccess
+                ? ServiceResponse<List<BookRecommendationDto>>.Failure(recommendationsResult.Error)
+                : ServiceResponse<List<BookRecommendationDto>>.Success(recommendationsResult.Value);
         }
         catch (Exception ex)
         {
-            HandleException(serviceResponse, bookRecommendationsDto.GoogleBooksId, ex);
+            return ServiceResponse<List<BookRecommendationDto>>.Failure(new Error("UnexpectedError", ex.Message));
         }
-
-        return serviceResponse;
     }
 
-    private async Task<Book> GetOrStoreBookWithEmbeddingsAsync(GetBookRecommendationsDto bookRecommendationsDto)
+
+    private async Task<Result<Book>> GetOrStoreBookWithEmbeddingsAsync(GetBookRecommendationsDto bookRecommendationsDto)
     {
-        _logger.LogInformation("Attempting to get book by GoogleBooksId: {GoogleBooksId}",
-            bookRecommendationsDto.GoogleBooksId);
+        if (string.IsNullOrEmpty(bookRecommendationsDto.GoogleBooksId))
+            return Result<Book>.Failure(GenerateRecommendationErrors.GoogleBooksIdNotFound);
+
         var book = await _bookRepository.GetByGoogleBooksIdAsync(bookRecommendationsDto.GoogleBooksId);
+        if (book != null) return Result<Book>.Success(book);
 
-        if (book != null)
-        {
-            _logger.LogInformation("Found book with GoogleBooksId: {GoogleBooksId} in repository",
-                bookRecommendationsDto.GoogleBooksId);
-        }
-        else
-        {
-            _logger.LogWarning(
-                "Book with GoogleBooksId: {GoogleBooksId} not found in repository. Attempting to store with embeddings.",
-                bookRecommendationsDto.GoogleBooksId);
-            book = await GetAndStoreEmbeddingsForBookAsync(bookRecommendationsDto);
-            _logger.LogInformation("Stored book with GoogleBooksId: {GoogleBooksId} and embeddings",
-                bookRecommendationsDto.GoogleBooksId);
-        }
-
-        return book;
+        return await GetAndStoreEmbeddingsForBookAsync(bookRecommendationsDto);
     }
 
-    private async Task<List<BookRecommendationDto>> GetRecommendationsAsync(Book book)
+
+    private async Task<Result<List<BookRecommendationDto>>> GetRecommendationsAsync(Book book)
     {
-        _logger.LogInformation($"Generating Recommendations for {book.Title}");
-        var recommendations = await _bookSearchService.GetNearestNeighbors(book);
-        return recommendations.GroupBy(r => r.Title).Select(g => g.First()).Take(5).ToList();
+        var recommendationsResult = await _bookSearchService.GetNearestNeighbors(book);
+
+        if (!recommendationsResult.IsSuccess)
+            return Result<List<BookRecommendationDto>>.Failure(recommendationsResult.Error);
+
+        var filteredRecommendations = recommendationsResult.Value.GroupBy(r => r.Title)
+            .Select(g => g.First())
+            .Take(5)
+            .ToList();
+        return Result<List<BookRecommendationDto>>.Success(filteredRecommendations);
     }
 
-    private async Task<Book> GetAndStoreEmbeddingsForBookAsync(GetBookRecommendationsDto bookRecommendationsDto)
-    {
-        var embeddingRequest = _bookEmbeddingService.ConstructEmbeddingRequest(bookRecommendationsDto);
-        var embedding = await _bookEmbeddingService.GetEmbeddingsFromOpenAI(embeddingRequest);
 
+    private async Task<Result<Book>> GetAndStoreEmbeddingsForBookAsync(GetBookRecommendationsDto bookRecommendationsDto)
+    {
+        var embeddingRequestResult = _bookEmbeddingService.ConstructEmbeddingRequest(bookRecommendationsDto);
+
+        if (!embeddingRequestResult.IsSuccess) return Result<Book>.Failure(embeddingRequestResult.Error);
+
+        var embedding = await _bookEmbeddingService.GetEmbeddingsFromOpenAI(embeddingRequestResult.Value);
         var book = _mapper.Map<Book>(bookRecommendationsDto);
         book.Embeddings = embedding.ToArray();
 
         await _bookRepository.StoreBookAsync(book);
-        return book;
-    }
-
-    private void HandleException(ServiceResponse<List<BookRecommendationDto>> serviceResponse, string googleBooksId,
-        Exception ex)
-    {
-        _logger.LogError(ex, "Error while generating recommendations for {GoogleBooksId}", googleBooksId);
-        serviceResponse.Success = false;
-        serviceResponse.AddError(ErrorCodes.Feature_BookRecommendations.GenerateRecommendationsError, ex.Message);
+        return Result<Book>.Success(book);
     }
 }
