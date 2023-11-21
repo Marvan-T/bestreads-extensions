@@ -39,6 +39,8 @@ public class BookRecommendationService : IBookRecommendationService
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error while generating recommendations for {GoogleBooksId}",
+                bookRecommendationsDto.GoogleBooksId);
             return Result<List<BookRecommendationDto>>.Failure(new Error("UnexpectedError", ex.Message));
         }
     }
