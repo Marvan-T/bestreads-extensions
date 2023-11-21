@@ -21,13 +21,12 @@ public static class BookFakers
             .RuleFor(b => b.GoogleBooksId, f => f.Random.AlphaNumeric(10))
             .RuleFor(b => b.IndustryIdentifiers, f => f.Make(1, () =>
             {
-                var types = new List<string> { "ISBN_10", "ISBN_13", "ASIN" };
+                var types = new List<string> { "ISBN_10", "ISBN_13" };
                 var selectedType = f.PickRandom(types);
                 var identifier = selectedType switch
                 {
                     "ISBN_10" => f.Random.ReplaceNumbers("##########"),
-                    "ISBN_13" => f.Random.ReplaceNumbers("#############"),
-                    "ASIN" => f.Random.AlphaNumeric(10)
+                    "ISBN_13" => f.Random.ReplaceNumbers("#############")
                 };
 
                 return new IndustryIdentifier
@@ -53,13 +52,12 @@ public static class BookFakers
             .RuleFor(b => b.GoogleBooksId, f => f.Random.AlphaNumeric(10))
             .RuleFor(b => b.IndustryIdentifiers, f => f.Make(1, () =>
             {
-                var types = new List<string> { "ISBN_10", "ISBN_13", "ASIN" };
+                var types = new List<string> { "ISBN_10", "ISBN_13" };
                 var selectedType = f.PickRandom(types);
                 var identifier = selectedType switch
                 {
                     "ISBN_10" => f.Random.ReplaceNumbers("##########"),
-                    "ISBN_13" => f.Random.ReplaceNumbers("#############"),
-                    "ASIN" => f.Random.AlphaNumeric(10)
+                    "ISBN_13" => f.Random.ReplaceNumbers("#############")
                 };
 
                 return new IndustryIdentifier
@@ -83,13 +81,12 @@ public static class BookFakers
             .RuleFor(b => b.GoogleBooksId, f => f.Random.AlphaNumeric(10))
             .RuleFor(b => b.IndustryIdentifiers, f => f.Make(1, () =>
             {
-                var types = new List<string> { "ISBN_10", "ISBN_13", "ASIN" };
+                var types = new List<string> { "ISBN_10", "ISBN_13" };
                 var selectedType = f.PickRandom(types);
                 var identifier = selectedType switch
                 {
                     "ISBN_10" => f.Random.ReplaceNumbers("##########"),
-                    "ISBN_13" => f.Random.ReplaceNumbers("#############"),
-                    "ASIN" => f.Random.AlphaNumeric(10)
+                    "ISBN_13" => f.Random.ReplaceNumbers("#############")
                 };
 
                 return new IndustryIdentifier
