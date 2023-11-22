@@ -10,13 +10,10 @@ namespace BestReads.Features.BookRecommendations.Controllers;
 public class BookRecommendationsController : ControllerBase
 {
     private readonly IBookRecommendationService _bookRecommendationService;
-    private readonly ILogger<BookRecommendationsController> _logger;
 
-    public BookRecommendationsController(IBookRecommendationService bookRecommendationService,
-        ILogger<BookRecommendationsController> logger)
+    public BookRecommendationsController(IBookRecommendationService bookRecommendationService)
     {
         _bookRecommendationService = bookRecommendationService;
-        _logger = logger;
     }
 
     [HttpPost]

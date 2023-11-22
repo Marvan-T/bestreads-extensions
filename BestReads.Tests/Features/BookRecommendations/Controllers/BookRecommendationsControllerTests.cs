@@ -4,7 +4,6 @@ using BestReads.Features.BookRecommendations.Errors;
 using BestReads.Features.BookRecommendations.Services.BookRecommendationService;
 using BestReads.Tests.Fakers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using static BestReads.Tests.ControllerTestHelper;
 
 namespace BestReads.Tests.Features.BookRecommendations.Controllers;
@@ -12,14 +11,12 @@ namespace BestReads.Tests.Features.BookRecommendations.Controllers;
 public class BookRecommendationsControllerTests
 {
     private readonly BookRecommendationsController _controller;
-    private readonly Mock<ILogger<BookRecommendationsController>> _mockLogger;
     private readonly Mock<IBookRecommendationService> _mockService;
 
     public BookRecommendationsControllerTests()
     {
         _mockService = new Mock<IBookRecommendationService>();
-        _mockLogger = new Mock<ILogger<BookRecommendationsController>>();
-        _controller = new BookRecommendationsController(_mockService.Object, _mockLogger.Object);
+        _controller = new BookRecommendationsController(_mockService.Object);
     }
 
     [Fact]
@@ -49,13 +46,13 @@ public class BookRecommendationsControllerTests
         var returningResult =
             CreateResult<List<BookRecommendationDto>>(null, false, GenerateRecommendationErrors.GoogleBooksIdNotFound);
         var expectedFailedServiceResponse = CreateServiceResponseFromResult(returningResult);
-    
+
         _mockService.SetupMockServiceCall(service => service.GenerateRecommendations(bookRecommendationsDto),
             returningResult);
-        
+
         // Act
         var result = await _controller.GenerateBookRecommendations(bookRecommendationsDto);
-        
+
         // Assert
         CheckResponse(result, typeof(BadRequestObjectResult), expectedFailedServiceResponse);
     }

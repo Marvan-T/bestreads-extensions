@@ -1,4 +1,5 @@
-﻿using BestReads.Features.BookRecommendations.Dtos;
+﻿using BestReads.Core.Utilities;
+using BestReads.Features.BookRecommendations.Dtos;
 using BestReads.Features.BookRecommendations.Services.BookSearchService;
 using BestReads.Infrastructure.AzureSearchClient;
 using BestReads.Tests.Fakers;
@@ -36,7 +37,7 @@ public class BookSearchServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Should().BeEquivalentTo(expectedRecommendations);
+        result.Should().BeEquivalentTo(Result<List<BookRecommendationDto>>.Success(expectedRecommendations));
 
         var expectedFilter = $"GoogleBooksId ne '{book.GoogleBooksId}' and Title ne '{book.Title}'";
         var expectedSelectOptions = new List<string>
