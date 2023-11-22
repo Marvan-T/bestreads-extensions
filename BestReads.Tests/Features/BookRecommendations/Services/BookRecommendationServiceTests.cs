@@ -2,6 +2,7 @@
 using BestReads.Core;
 using BestReads.Core.Utilities;
 using BestReads.Features.BookRecommendations.Dtos;
+using BestReads.Features.BookRecommendations.Errors;
 using BestReads.Features.BookRecommendations.Repository;
 using BestReads.Features.BookRecommendations.Services.BookEmbeddingService;
 using BestReads.Features.BookRecommendations.Services.BookRecommendationService;
@@ -148,5 +149,48 @@ public class BookRecommendationServiceTests
         result.IsSuccess.Should().BeTrue();
         result.Data.Count.Should().Be(5);
         result.Data.Should().OnlyHaveUniqueItems(r => r.Title);
+    }
+
+    [Fact]
+    public async Task GenerateRecommendations_MissingGoogleBooksId_ShouldReturnFailure()
+    {
+        // Arrange
+        var bookRecommendationsDto = new GetBookRecommendationsDto(); // Empty or null GoogleBooksId
+
+        // Act
+        var result = await _service.GenerateRecommendations(bookRecommendationsDto);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Be(GenerateRecommendationErrors.GoogleBooksIdNotFound);
+        _mockBookEmbeddingService.Verify(
+            embeddingService => embeddingService.GetEmbeddingsFromOpenAI(It.IsAny<EmbeddingRequest>()), Times.Never());
+        _mockBookEmbeddingService.Verify(
+            embeddingService => embeddingService.ConstructEmbeddingRequest(It.IsAny<GetBookRecommendationsDto>()),
+            Times.Never());
+        _mockBookSearchService.Verify(
+            searchService => searchService.GetNearestNeighbors(It.IsAny<Book>()), Times.Never());
+    }
+
+    [Fact]
+    public async Task GenerateRecommendations_FailedEmbeddingGeneration_ShouldReturnFailure()
+    {
+        // Arrange
+        var bookRecommendationsDto = BookFakers.GetBookRecommendationDtoFaker().Generate();
+        _mockBookRepository.Setup(repo => repo.GetByGoogleBooksIdAsync(bookRecommendationsDto.GoogleBooksId))
+            .ReturnsAsync((Book)null);
+        _mockBookEmbeddingService.Setup(service => service.ConstructEmbeddingRequest(bookRecommendationsDto))
+            .Returns(Result<EmbeddingRequest>.Failure(GenerateRecommendationErrors.TitleRequired));
+
+        // Act
+        var result = await _service.GenerateRecommendations(bookRecommendationsDto);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Be(GenerateRecommendationErrors.TitleRequired);
+        _mockBookEmbeddingService.Verify(
+            embeddingService => embeddingService.GetEmbeddingsFromOpenAI(It.IsAny<EmbeddingRequest>()), Times.Never());
+        _mockBookSearchService.Verify(
+            searchService => searchService.GetNearestNeighbors(It.IsAny<Book>()), Times.Never());
     }
 }
