@@ -10,24 +10,22 @@ namespace BestReads.Features.BookRecommendations.Controllers;
 public class BookRecommendationsController : ControllerBase
 {
     private readonly IBookRecommendationService _bookRecommendationService;
-    private readonly ILogger<BookRecommendationsController> _logger;
 
-    public BookRecommendationsController(IBookRecommendationService bookRecommendationService,
-        ILogger<BookRecommendationsController> logger)
+    public BookRecommendationsController(IBookRecommendationService bookRecommendationService)
     {
         _bookRecommendationService = bookRecommendationService;
-        _logger = logger;
     }
 
     [HttpPost]
     public async Task<ActionResult<ServiceResponse<List<BookRecommendationDto>>>> GenerateBookRecommendations(
         GetBookRecommendationsDto bookRecommendationsDto)
-
     {
-        _logger.LogInformation($"Request: {bookRecommendationsDto.Title}");
-        _logger.LogInformation("From Controller GoogleBooksId: {GoogleBooksId}", bookRecommendationsDto.GoogleBooksId);
-        var response = await _bookRecommendationService.GenerateRecommendations(bookRecommendationsDto);
-        if (!response.Success) return BadRequest(response);
-        return Ok(response);
+        var serviceResponse = (await _bookRecommendationService.GenerateRecommendations(bookRecommendationsDto))
+            .Match(
+                ServiceResponse<List<BookRecommendationDto>>.Success,
+                ServiceResponse<List<BookRecommendationDto>>.Failure
+            );
+
+        return serviceResponse.Result.IsSuccess ? Ok(serviceResponse) : BadRequest(serviceResponse);
     }
 }

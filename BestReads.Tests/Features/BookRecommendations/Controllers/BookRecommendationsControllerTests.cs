@@ -1,9 +1,9 @@
 ﻿using BestReads.Features.BookRecommendations.Controllers;
 using BestReads.Features.BookRecommendations.Dtos;
+using BestReads.Features.BookRecommendations.Errors;
 using BestReads.Features.BookRecommendations.Services.BookRecommendationService;
 using BestReads.Tests.Fakers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using static BestReads.Tests.ControllerTestHelper;
 
 namespace BestReads.Tests.Features.BookRecommendations.Controllers;
@@ -12,25 +12,24 @@ public class BookRecommendationsControllerTests
 {
     private readonly BookRecommendationsController _controller;
     private readonly Mock<IBookRecommendationService> _mockService;
-    private readonly Mock<ILogger<BookRecommendationsController>> _mockLogger;
 
     public BookRecommendationsControllerTests()
     {
         _mockService = new Mock<IBookRecommendationService>();
-        _mockLogger = new Mock<ILogger<BookRecommendationsController>>();
-        _controller = new BookRecommendationsController(_mockService.Object, _mockLogger.Object);
+        _controller = new BookRecommendationsController(_mockService.Object);
     }
 
     [Fact]
     public async Task GenerateBookRecommendations_WhenRequestIsValid_ReturnsListOfBookRecommendations()
     {
         // Arrange
-        var bookRecommendationsDto = new GetBookRecommendationsDto(); 
+        var bookRecommendationsDto = BookFakers.GetBookRecommendationDtoFaker().Generate();
         var bookList = BookFakers.BookRecommendationDtoFaker().Generate(2);
 
-        var expectedServiceResponse = CreateServiceResponse(bookList);
+        var returningResult = CreateResult(bookList);
+        var expectedServiceResponse = CreateServiceResponseFromResult(returningResult);
         _mockService.SetupMockServiceCall(service => service.GenerateRecommendations(bookRecommendationsDto),
-            expectedServiceResponse);
+            returningResult);
 
         // Act
         var result = await _controller.GenerateBookRecommendations(bookRecommendationsDto);
@@ -43,11 +42,13 @@ public class BookRecommendationsControllerTests
     public async Task GenerateBookRecommendations_ForFailedServiceResponse_ReturnsBadRequest()
     {
         // Arrange
-        var bookRecommendationsDto = BookFakers.GetBookRecommendationDtoFaker().Generate(); 
-        var expectedFailedServiceResponse =
-            CreateServiceResponse<List<BookRecommendationDto>>(null, false);
+        var bookRecommendationsDto = BookFakers.GetBookRecommendationDtoFaker().Generate();
+        var returningResult =
+            CreateResult<List<BookRecommendationDto>>(null, false, GenerateRecommendationErrors.GoogleBooksIdNotFound);
+        var expectedFailedServiceResponse = CreateServiceResponseFromResult(returningResult);
+
         _mockService.SetupMockServiceCall(service => service.GenerateRecommendations(bookRecommendationsDto),
-            expectedFailedServiceResponse);
+            returningResult);
 
         // Act
         var result = await _controller.GenerateBookRecommendations(bookRecommendationsDto);

@@ -1,5 +1,7 @@
 ﻿using BestReads.Core;
+using BestReads.Core.Utilities;
 using BestReads.Features.BookRecommendations.Dtos;
+using BestReads.Features.BookRecommendations.Errors;
 using BestReads.Infrastructure.AzureSearchClient;
 
 namespace BestReads.Features.BookRecommendations.Services.BookSearchService;
@@ -13,14 +15,19 @@ public class BookSearchService : IBookSearchService
         _azureSearchClient = azureSearchClient;
     }
 
-    public async Task<List<BookRecommendationDto>> GetNearestNeighbors(Book book)
+    public async Task<Result<List<BookRecommendationDto>>> GetNearestNeighbors(Book book)
     {
         var filter = $"GoogleBooksId ne '{book.GoogleBooksId}' and Title ne '{book.Title}'";
-        return await _azureSearchClient.SingleVectorSearch<BookRecommendationDto>(book.Embeddings,
+        var recommendations = await _azureSearchClient.SingleVectorSearch<BookRecommendationDto>(book.Embeddings,
             "Embeddings", filter,
             new List<string>
             {
                 "doc_id, GoogleBooksId, Title, Authors, Categories, Description, Publisher, PublishedDate, Thumbnail, IndustryIdentifiers"
             });
+
+        if (recommendations == null || !recommendations.Any())
+            return Result<List<BookRecommendationDto>>.Failure(GenerateRecommendationErrors.RecommendationsNotFound);
+
+        return Result<List<BookRecommendationDto>>.Success(recommendations);
     }
 }
