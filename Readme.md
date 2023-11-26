@@ -2,19 +2,32 @@
 
 # Best Reads Extensions
 
-This project serves as an extension to improve the final year group project I was a part of at the university.
+## Project Overview
 
-- Original Group Project: [https://github.com/laurenmaylittle-cs/book-recommendations](https://github.com/laurenmaylittle-cs/book-recommendations)
-- Fork that I currently maintain: [https://github.com/Marvan-T/book-recommendations](https://github.com/Marvan-T/book-recommendations)
+"Best Reads" is a web application originally developed as a final year group project at university. Our aim is to enhance the book discovery experience for users.
 
-The project is deployed on Azure and can be accessed using either of the URLs:
+- Original Project Repository: [Best Reads](https://github.com/laurenmaylittle-cs/book-recommendations)
 
-- [https://best-reads.azurewebsites.net](https://best-reads.azurewebsites.net)
-- [https://best-reads.live](https://best-reads.live)
+## Current Version
 
-## New Features Introduced
+I am actively maintaining and improving a fork of the original project:
 
-### Recommendations
+- Fork Repository: [Best Reads Fork](https://github.com/Marvan-T/book-recommendations)
+
+## Deployment
+
+The project is deployed on Azure. You can visit the application using either of the following URLs:
+
+- Main URL: [Best Reads](https://best-reads.live)
+- Alternative URL: [Best Reads on Azure](https://best-reads.azurewebsites.net)
+
+## Enhancements and Features
+
+Best Reads Extensions is built as an extra layer on top of the original project. It works as its own API, exposing new features to the original application.
+
+### New Features Introduced:
+
+#### Recommendations
 
 - Implemented a new recommendations layer utilizing embeddings to identify similar items (books).
 - An overview of the process is illustrated in the workflow diagram below.
