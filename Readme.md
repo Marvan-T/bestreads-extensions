@@ -4,6 +4,11 @@
 
 This project serves as an extension to improve the final year group project I was a part of at the university.
 
+The project is deployed on Azure and can be accessed using either of the URLs:
+
+- [https://best-reads.azurewebsites.net/](https://best-reads.azurewebsites.net/)
+- [https://best-reads-live/](https://best-reads.live/)
+
 ## New Features Introduced
 
 ### Recommendations
