@@ -12,3 +12,6 @@ This project serves as an extension to improve the final year group project I wa
 - An overview of the process is illustrated in the workflow diagram below.
 
 <img src="./Images/Flowchart-Recommendations.png" width="90%">
+
+
+[![Thumbnail](https://github.com/path/to/thumbnail.jpg){: width="50%"}](https://github.com/Marvan-T/bestreads-extensions/assets/65969444/dd644f80-2b07-4452-baf3-350206d308ad)
