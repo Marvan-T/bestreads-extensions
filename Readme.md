@@ -4,6 +4,9 @@
 
 This project serves as an extension to improve the final year group project I was a part of at the university.
 
+- Original Group Project: [https://github.com/laurenmaylittle-cs/book-recommendations](https://github.com/laurenmaylittle-cs/book-recommendations)
+- Fork that I currently maintain: [https://github.com/Marvan-T/book-recommendations](https://github.com/Marvan-T/book-recommendations)
+
 The project is deployed on Azure and can be accessed using either of the URLs:
 
 - [https://best-reads.azurewebsites.net/](https://best-reads.azurewebsites.net/)
