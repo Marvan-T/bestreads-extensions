@@ -2,6 +2,6 @@
 
 public class EmbeddingRequest
 {
-    public string Model { get; set; } = "text-embedding-ada-002"; 
-    public string Text { get; set; }
+    public string Model { get; set; } = "text-embedding-ada-002";
+    public string Text { get; set; } = string.Empty;
 }
