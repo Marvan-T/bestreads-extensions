@@ -14,14 +14,14 @@ public class OpenAIClientService : IOpenAICleint
         _openAiClient = new OpenAIClient(configuration["Open_AI_Key"]);
     }
 
-    public async Task<IReadOnlyList<float>> GetEmbeddingsAsync(EmbeddingRequest embeddingRequest)
+    public async Task<IReadOnlyList<float>> GetEmbeddingsAsync(EmbeddingRequest request)
     {
         var response =
-            await _openAiClient.GetEmbeddingsAsync(embeddingRequest.Model,
-                new EmbeddingsOptions(embeddingRequest.Text));
+            await _openAiClient.GetEmbeddingsAsync(request.Model,
+                new EmbeddingsOptions(request.Text));
 
         if (response.Value.Data.Any()) return response.Value.Data[0].Embedding;
 
-        throw new EmbeddingRequestException(embeddingRequest);
+        throw new EmbeddingRequestException(request);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace BestReads.Core.Data;
 
-public interface IIndexManager<T>
+public interface IIndexManager
 {
     void EnsureIndexes();
 }
