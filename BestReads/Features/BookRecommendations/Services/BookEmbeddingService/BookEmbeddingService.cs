@@ -43,10 +43,10 @@ public class BookEmbeddingService : IBookEmbeddingService
         if (string.IsNullOrWhiteSpace(dto.Title))
             return Result<GetBookRecommendationsDto>.Failure(GenerateRecommendationErrors.TitleRequired);
 
-        if (dto.Authors == null || !dto.Authors.Any() || dto.Authors.Any(string.IsNullOrWhiteSpace))
+        if (dto.Authors == null || !dto.Authors.Exists(author => !string.IsNullOrWhiteSpace(author)))
             return Result<GetBookRecommendationsDto>.Failure(GenerateRecommendationErrors.AuthorsRequired);
 
-        if (dto.Categories == null || !dto.Categories.Any() || dto.Categories.Any(string.IsNullOrWhiteSpace))
+        if (dto.Categories == null || !dto.Categories.Exists(category => !string.IsNullOrWhiteSpace(category)))
             return Result<GetBookRecommendationsDto>.Failure(GenerateRecommendationErrors.CategoriesRequired);
 
         if (string.IsNullOrWhiteSpace(dto.Description))
