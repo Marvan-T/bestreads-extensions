@@ -1,13 +1,12 @@
-﻿using BestReads.Core;
-using BestReads.Core.Data;
+﻿using BestReads.Core.Data;
 
 namespace BestReads.Infrastructure.Data;
 
 public class IndexInitializer
 {
-    private readonly IIndexManager<Book> _bookIndexManager;
+    private readonly IIndexManager _bookIndexManager;
 
-    public IndexInitializer(IIndexManager<Book> bookIndexManager)
+    public IndexInitializer(IIndexManager bookIndexManager)
     {
         _bookIndexManager = bookIndexManager;
     }

@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 namespace BestReads.Infrastructure.Data;
 
-public class BookIndexManager : IIndexManager<Book>
+public class BookIndexManager : IIndexManager
 {
     private readonly IMongoCollection<Book> _books;
 

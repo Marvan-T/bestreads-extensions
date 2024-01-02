@@ -16,7 +16,7 @@ public static class ApplicationBuilderExtensions
     public static void RegisterDatabaseDependencies(this IServiceCollection services)
     {
         services.AddScoped<MongoDbContext>();
-        services.AddTransient<IIndexManager<Book>, BookIndexManager>();
+        services.AddTransient<IIndexManager, BookIndexManager>();
         services.AddTransient<IndexInitializer>();
     }
 
