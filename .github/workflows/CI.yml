@@ -9,7 +9,7 @@ on:
     branches: [ "**" ]
 
 env:
-  DOTNET_VERSION: 7.0.x
+  DOTNET_VERSION: 8.0.x
 
 jobs:
   run-unit-tests:

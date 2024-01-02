@@ -29,14 +29,17 @@ public class AzureSearchClient : IAzureSearchClient
     {
         var searchOptions = new SearchOptions
         {
-            VectorQueries =
+            VectorSearch = new VectorSearchOptions
             {
-                new RawVectorQuery { Vector = queryEmbeddings, KNearestNeighborsCount = 8, Fields = { vectorField } }
+                Queries =
+                {
+                    new VectorizedQuery(queryEmbeddings) { KNearestNeighborsCount = 8, Fields = { vectorField } }
+                }
             },
             Filter = filter
         };
 
-        if (selectOptions != null)
+        if (selectOptions.Count > 0)
             foreach (var option in selectOptions)
                 searchOptions.Select.Add(option);
 
