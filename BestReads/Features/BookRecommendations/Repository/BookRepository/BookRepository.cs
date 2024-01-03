@@ -4,14 +4,9 @@ using MongoDB.Driver;
 
 namespace BestReads.Features.BookRecommendations.Repository;
 
-public class BookRepository : IBookRepository
+public class BookRepository(MongoDbContext mongoDbContext) : IBookRepository
 {
-    private readonly IMongoCollection<Book> _books;
-
-    public BookRepository(MongoDbContext mongoDbContext)
-    {
-        _books = mongoDbContext.Books;
-    }
+    private readonly IMongoCollection<Book> _books = mongoDbContext.Books;
 
     public Task<Book?> GetByGoogleBooksIdAsync(string googleBooksId)
     {

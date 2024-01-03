@@ -9,24 +9,14 @@ using BestReads.Features.BookRecommendations.Services.BookSearchService;
 
 namespace BestReads.Features.BookRecommendations.Services.BookRecommendationService;
 
-public class BookRecommendationService : IBookRecommendationService
+public class BookRecommendationService(
+    IBookRepository bookRepository,
+    IBookEmbeddingService bookEmbeddingService,
+    IMapper mapper,
+    ILogger<BookRecommendationService> logger,
+    IBookSearchService bookSearchService)
+    : IBookRecommendationService
 {
-    private readonly IBookEmbeddingService _bookEmbeddingService;
-    private readonly IBookRepository _bookRepository;
-    private readonly IBookSearchService _bookSearchService;
-    private readonly ILogger<BookRecommendationService> _logger;
-    private readonly IMapper _mapper;
-
-    public BookRecommendationService(IBookRepository bookRepository, IBookEmbeddingService bookEmbeddingService,
-        IMapper mapper, ILogger<BookRecommendationService> logger, IBookSearchService bookSearchService)
-    {
-        _bookRepository = bookRepository;
-        _bookEmbeddingService = bookEmbeddingService;
-        _mapper = mapper;
-        _logger = logger;
-        _bookSearchService = bookSearchService;
-    }
-
     public async Task<Result<List<BookRecommendationDto>>> GenerateRecommendations(
         GetBookRecommendationsDto bookRecommendationsDto)
     {
@@ -39,7 +29,7 @@ public class BookRecommendationService : IBookRecommendationService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while generating recommendations for {GoogleBooksId}",
+            logger.LogError(ex, "Error while generating recommendations for {GoogleBooksId}",
                 bookRecommendationsDto.GoogleBooksId);
             return Result<List<BookRecommendationDto>>.Failure(new Error("UnexpectedError", ex.Message));
         }
@@ -51,7 +41,7 @@ public class BookRecommendationService : IBookRecommendationService
         if (string.IsNullOrEmpty(bookRecommendationsDto.GoogleBooksId))
             return Result<Book>.Failure(GenerateRecommendationErrors.GoogleBooksIdNotFound);
 
-        var book = await _bookRepository.GetByGoogleBooksIdAsync(bookRecommendationsDto.GoogleBooksId);
+        var book = await bookRepository.GetByGoogleBooksIdAsync(bookRecommendationsDto.GoogleBooksId);
         if (book != null) return Result<Book>.Success(book);
 
         return await GetAndStoreEmbeddingsForBookAsync(bookRecommendationsDto);
@@ -60,7 +50,7 @@ public class BookRecommendationService : IBookRecommendationService
 
     private async Task<Result<List<BookRecommendationDto>>> GetRecommendationsAsync(Book book)
     {
-        var recommendationsResult = await _bookSearchService.GetNearestNeighbors(book);
+        var recommendationsResult = await bookSearchService.GetNearestNeighbors(book);
 
         if (!recommendationsResult.IsSuccess)
             return Result<List<BookRecommendationDto>>.Failure(recommendationsResult.Error);
@@ -75,15 +65,15 @@ public class BookRecommendationService : IBookRecommendationService
 
     private async Task<Result<Book>> GetAndStoreEmbeddingsForBookAsync(GetBookRecommendationsDto bookRecommendationsDto)
     {
-        var embeddingRequestResult = _bookEmbeddingService.ConstructEmbeddingRequest(bookRecommendationsDto);
+        var embeddingRequestResult = bookEmbeddingService.ConstructEmbeddingRequest(bookRecommendationsDto);
 
         if (!embeddingRequestResult.IsSuccess) return Result<Book>.Failure(embeddingRequestResult.Error);
 
-        var embedding = await _bookEmbeddingService.GetEmbeddingsFromOpenAI(embeddingRequestResult.Data);
-        var book = _mapper.Map<Book>(bookRecommendationsDto);
+        var embedding = await bookEmbeddingService.GetEmbeddingsFromOpenAI(embeddingRequestResult.Data);
+        var book = mapper.Map<Book>(bookRecommendationsDto);
         book.Embeddings = embedding.ToArray();
 
-        await _bookRepository.StoreBookAsync(book);
+        await bookRepository.StoreBookAsync(book);
         return Result<Book>.Success(book);
     }
 }

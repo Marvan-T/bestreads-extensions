@@ -5,19 +5,11 @@ using BestReads.Features.BookRecommendations.Errors;
 
 namespace BestReads.Features.BookRecommendations.Services.BookEmbeddingService;
 
-public class BookEmbeddingService : IBookEmbeddingService
+public class BookEmbeddingService(IOpenAICleint openAiClient) : IBookEmbeddingService
 {
-    private readonly IOpenAICleint _openAiCleint;
-
-    public BookEmbeddingService(IOpenAICleint openAiCleint)
-    {
-        _openAiCleint = openAiCleint;
-    }
-
-
     public async Task<IReadOnlyList<float>> GetEmbeddingsFromOpenAI(EmbeddingRequest request)
     {
-        return await _openAiCleint.GetEmbeddingsAsync(request);
+        return await openAiClient.GetEmbeddingsAsync(request);
     }
 
     public Result<EmbeddingRequest> ConstructEmbeddingRequest(GetBookRecommendationsDto bookRecommendationsDto)
