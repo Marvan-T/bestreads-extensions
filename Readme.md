@@ -16,10 +16,9 @@ I am actively maintaining and improving a fork of the original project:
 
 ## Deployment
 
-The project is deployed on Azure. You can visit the application using either of the following URLs:
+The project is deployed on Azure. You can visit the application using the following URL:
 
-- Main URL: [Best Reads](https://best-reads.live)
-- Alternative URL: [Best Reads on Azure](https://best-reads.azurewebsites.net)
+- URL: [Best Reads on Azure](https://best-reads.azurewebsites.net)
 
 ## Enhancements and Features
 

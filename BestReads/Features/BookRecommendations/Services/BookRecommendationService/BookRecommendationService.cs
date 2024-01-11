@@ -14,7 +14,8 @@ public class BookRecommendationService(
     IBookEmbeddingService bookEmbeddingService,
     IMapper mapper,
     ILogger<BookRecommendationService> logger,
-    IBookSearchService bookSearchService)
+    IBookSearchService bookSearchService,
+    IConfiguration configuration)
     : IBookRecommendationService
 {
     public async Task<Result<List<BookRecommendationDto>>> GenerateRecommendations(
@@ -55,11 +56,16 @@ public class BookRecommendationService(
         if (!recommendationsResult.IsSuccess)
             return Result<List<BookRecommendationDto>>.Failure(recommendationsResult.Error);
 
-        var filteredRecommendations = recommendationsResult.Data.GroupBy(r => r.Title)
+        var recommendations = recommendationsResult.Data
+            .GroupBy(r => r.Title)
             .Select(g => g.First())
-            .Take(5)
             .ToList();
-        return Result<List<BookRecommendationDto>>.Success(filteredRecommendations);
+
+        foreach (var recommendation in recommendations)
+            if (string.IsNullOrEmpty(recommendation.Thumbnail))
+                recommendation.Thumbnail = configuration["DEFAULT_THUMBNAIL_URL"];
+
+        return Result<List<BookRecommendationDto>>.Success(recommendations.Take(5).ToList());
     }
 
 
