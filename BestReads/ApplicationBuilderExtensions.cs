@@ -5,9 +5,12 @@ using BestReads.Features.BookRecommendations.Services.BookEmbeddingService;
 using BestReads.Features.BookRecommendations.Services.BookRecommendationService;
 using BestReads.Features.BookRecommendations.Services.BookSearchService;
 using BestReads.Infrastructure;
+using BestReads.Infrastructure.ApiClients.NYTimes;
+using BestReads.Infrastructure.ApiClients.NYTimes.Handlers;
 using BestReads.Infrastructure.AzureSearchClient;
 using BestReads.Infrastructure.Data;
 using MongoDB.Driver;
+using Refit;
 
 namespace BestReads;
 
@@ -24,6 +27,7 @@ public static class ApplicationBuilderExtensions
     {
         services.AddScoped<IOpenAICleint, OpenAIClientService>();
         services.AddScoped<IAzureSearchClient, AzureSearchClient>();
+        services.AddTransient<NyTimesAuthenticationDelegatingHandler>();
     }
 
     public static void RegisterDependencies(this IServiceCollection services)
@@ -43,5 +47,12 @@ public static class ApplicationBuilderExtensions
     {
         services.AddSingleton<IMongoClient, MongoClient>(sp =>
             new MongoClient(mongoDbSettings.ConnectionString));
+    }
+
+    public static void SetupRefit(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddRefitClient<INYTimesApiClient>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(configuration["NYTimesApi:BaseAddress"]))
+            .AddHttpMessageHandler<NyTimesAuthenticationDelegatingHandler>();
     }
 }

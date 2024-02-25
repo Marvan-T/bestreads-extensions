@@ -18,6 +18,7 @@ services.RegisterDatabaseDependencies();
 services.RegisterInfrastructureDependencies();
 services.RegisterDependencies();
 services.AddDefaultAutoMapper();
+services.SetupRefit(builder.Configuration);
 
 var app = builder.Build();
 
