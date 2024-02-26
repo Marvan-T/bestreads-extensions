@@ -7,7 +7,6 @@ public class NyTimesAuthenticationDelegatingHandler(
     ILogger<NyTimesAuthenticationDelegatingHandler> logger)
     : DelegatingHandler
 {
-    private readonly ILogger<NyTimesAuthenticationDelegatingHandler> _logger;
     private readonly string _nyTimesApiKey = configuration["NYTimes:ApiKey"]!;
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
