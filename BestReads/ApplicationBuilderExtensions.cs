@@ -6,10 +6,12 @@ using BestReads.Features.BookRecommendations.Services.BookRecommendationService;
 using BestReads.Features.BookRecommendations.Services.BookSearchService;
 using BestReads.Infrastructure;
 using BestReads.Infrastructure.ApiClients.NYTimes;
+using BestReads.Infrastructure.ApiClients.NYTimes.Converters;
 using BestReads.Infrastructure.ApiClients.NYTimes.Handlers;
 using BestReads.Infrastructure.AzureSearchClient;
 using BestReads.Infrastructure.Data;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using Refit;
 
 namespace BestReads;
@@ -51,7 +53,11 @@ public static class ApplicationBuilderExtensions
 
     public static void SetupRefit(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddRefitClient<INYTimesApiClient>()
+        var settings = new RefitSettings(new NewtonsoftJsonContentSerializer(new JsonSerializerSettings
+        {
+            Converters = { new ListDtoConverter() }
+        }));
+        services.AddRefitClient<INYTimesApiClient>(settings)
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(configuration["NYTimesApi:BaseAddress"]))
             .AddHttpMessageHandler<NyTimesAuthenticationDelegatingHandler>();
     }

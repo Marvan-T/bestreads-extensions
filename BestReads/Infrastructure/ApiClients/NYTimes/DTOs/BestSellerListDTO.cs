@@ -1,6 +1,6 @@
 ﻿namespace BestReads.Infrastructure.ApiClients.NYTimes.DTOs;
 
-public class BestSellerListDTO
+public class BestSellerListDto
 {
-    public ResultDTO Results { get; set; }
+    public ResultDto Results { get; set; }
 }

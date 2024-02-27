@@ -1,9 +1,9 @@
 ﻿namespace BestReads.Infrastructure.ApiClients.NYTimes.DTOs;
 
-public class ListDTO
+public class ListDto
 {
     public int ListId { get; set; }
     public string ListName { get; set; }
     public string DisplayName { get; set; }
-    public List<BookDTO> Books { get; set; }
+    public List<BookDto> Books { get; set; }
 }
