@@ -18,7 +18,7 @@ I am actively maintaining and improving a fork of the original project:
 
 The project is deployed on Azure. You can visit the application using the following URL:
 
-- URL: [Best Reads on Azure](https://best-reads.azurewebsites.net)
+- URL: [Best Reads](https://best-reads.today)
 
 ## Enhancements and Features
 
