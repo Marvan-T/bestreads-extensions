@@ -6,7 +6,7 @@ using BestReads.Features.BookRecommendations.Exceptions;
 
 namespace BestReads.Infrastructure;
 
-public class OpenAIClientService : IOpenAICleint
+public class OpenAIClientService : IOpenAIClient
 {
     private readonly OpenAIClient _openAiClient;
 

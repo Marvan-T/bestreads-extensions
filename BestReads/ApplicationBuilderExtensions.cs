@@ -25,7 +25,7 @@ public static class ApplicationBuilderExtensions
 
     public static void RegisterInfrastructureDependencies(this IServiceCollection services)
     {
-        services.AddScoped<IOpenAICleint, OpenAIClientService>();
+        services.AddScoped<IOpenAIClient, OpenAIClientService>();
         services.AddScoped<IAzureSearchClient, AzureSearchClient>();
         services.AddTransient<NyTimesAuthenticationDelegatingHandler>();
     }

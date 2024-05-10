@@ -5,7 +5,7 @@ using BestReads.Features.BookRecommendations.Errors;
 
 namespace BestReads.Features.BookRecommendations.Services.BookEmbeddingService;
 
-public class BookEmbeddingService(IOpenAICleint openAiClient) : IBookEmbeddingService
+public class BookEmbeddingService(IOpenAIClient openAiClient) : IBookEmbeddingService
 {
     public async Task<IReadOnlyList<float>> GetEmbeddingsFromOpenAI(EmbeddingRequest request)
     {
