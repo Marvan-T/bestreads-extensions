@@ -1,5 +1,6 @@
 ﻿using BestReads.Core;
 using BestReads.Core.Data;
+using BestReads.Features.BestSellers.Services.BestSellersService;
 using BestReads.Features.BookRecommendations.Repository;
 using BestReads.Features.BookRecommendations.Services.BookEmbeddingService;
 using BestReads.Features.BookRecommendations.Services.BookRecommendationService;
@@ -36,6 +37,7 @@ public static class ApplicationBuilderExtensions
         services.AddScoped<IBookRepository, BookRepository>();
         services.AddScoped<IBookRecommendationService, BookRecommendationService>();
         services.AddScoped<IBookSearchService, BookSearchService>();
+        services.AddScoped<IBestSellersService, BestSellersService>();
     }
 
     public static void AddDefaultAutoMapper(this IServiceCollection services)
