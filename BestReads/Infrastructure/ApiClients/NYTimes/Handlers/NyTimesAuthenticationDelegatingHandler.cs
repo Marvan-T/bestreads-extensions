@@ -3,8 +3,7 @@
 namespace BestReads.Infrastructure.ApiClients.NYTimes.Handlers;
 
 public class NyTimesAuthenticationDelegatingHandler(
-    IConfiguration configuration,
-    ILogger<NyTimesAuthenticationDelegatingHandler> logger)
+    IConfiguration configuration)
     : DelegatingHandler
 {
     private readonly string _nyTimesApiKey = configuration["NYTimes:ApiKey"]!;
@@ -16,7 +15,7 @@ public class NyTimesAuthenticationDelegatingHandler(
         query["api-key"] = _nyTimesApiKey;
         request.RequestUri = new UriBuilder(request.RequestUri) { Query = query.ToString() }.Uri;
 
-        logger.LogInformation($"Sending request with NYTimesAuthenticationDelegatingHandler to {request.RequestUri}");
+        //Todo: add logging
         return await base.SendAsync(request, cancellationToken);
     }
 }
