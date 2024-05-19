@@ -9,11 +9,11 @@ namespace BestReads.Tests.Features.BookRecommendations.Services;
 public class BookEmbeddingServiceTests
 {
     private readonly BookEmbeddingService _bookEmbeddingService;
-    private readonly Mock<IOpenAICleint> _openAiClientMock;
+    private readonly Mock<IOpenAIClient> _openAiClientMock;
 
     public BookEmbeddingServiceTests()
     {
-        _openAiClientMock = new Mock<IOpenAICleint>();
+        _openAiClientMock = new Mock<IOpenAIClient>();
         _bookEmbeddingService = new BookEmbeddingService(_openAiClientMock.Object);
     }
 

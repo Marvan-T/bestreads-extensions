@@ -36,7 +36,6 @@ public class BookRecommendationService(
         }
     }
 
-
     private async Task<Result<Book>> GetOrStoreBookWithEmbeddingsAsync(GetBookRecommendationsDto bookRecommendationsDto)
     {
         if (string.IsNullOrEmpty(bookRecommendationsDto.GoogleBooksId))
@@ -47,7 +46,6 @@ public class BookRecommendationService(
 
         return await GetAndStoreEmbeddingsForBookAsync(bookRecommendationsDto);
     }
-
 
     private async Task<Result<List<BookRecommendationDto>>> GetRecommendationsAsync(Book book)
     {
@@ -61,9 +59,10 @@ public class BookRecommendationService(
             .Select(g => g.First())
             .ToList();
 
-        foreach (var recommendation in recommendations)
-            if (string.IsNullOrEmpty(recommendation.Thumbnail))
-                recommendation.Thumbnail = configuration["DEFAULT_THUMBNAIL_URL"];
+        var recommendationsWithEmptyThumbnails = recommendations.Where(r => string.IsNullOrEmpty(r.Thumbnail));
+        foreach (var recommendation in recommendationsWithEmptyThumbnails)
+            recommendation.Thumbnail = configuration["DEFAULT_THUMBNAIL_URL"];
+
 
         return Result<List<BookRecommendationDto>>.Success(recommendations.Take(5).ToList());
     }
