@@ -3,7 +3,6 @@ using System.Web;
 using BestReads.Infrastructure.ApiClients.NYTimes.Handlers;
 using Bogus;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Moq.Protected;
 
 namespace BestReads.Tests.Handlers;
@@ -26,9 +25,7 @@ public class NyTimesAuthenticationDelegatingHandlerTests
             .AddInMemoryCollection(inMemorySettings)
             .Build();
 
-        var mockLogger = new Mock<ILogger<NyTimesAuthenticationDelegatingHandler>>();
-
-        var handler = new NyTimesAuthenticationDelegatingHandler(configuration, mockLogger.Object)
+        var handler = new NyTimesAuthenticationDelegatingHandler(configuration)
         {
             InnerHandler = new Mock<HttpMessageHandler>().Object
         };
