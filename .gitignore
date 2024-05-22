@@ -4,3 +4,8 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 .idea
+.vs
+.vscode
+BestReads/scriptcs_bin
+.editorconfig
+BestReads Extensions.sln.DotSettings.user
