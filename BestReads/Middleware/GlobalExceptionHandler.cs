@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.Diagnostics;
 
 namespace BestReads;
 
-internal sealed class GlobalExceptionHandler : IExceptionHandler
+public sealed class GlobalExceptionHandler : IExceptionHandler
 {
-    private readonly ILogger<GlobalExceptionHandler> _logger;
-
     public static readonly Error ServerError =
         new(
             "internal_server_error",
             "An internal server error has occurred. Please try again later."
         );
+
+    private readonly ILogger<GlobalExceptionHandler> _logger;
 
     public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
     {
@@ -27,7 +27,7 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
     {
         _logger.LogError(exception, "Exception occured: {Message}", exception.Message);
 
-        ServiceResponse<bool> response = ServiceResponse<bool>.Failure(ServerError);
+        var response = ServiceResponse<bool>.Failure(ServerError);
 
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
         await httpContext.Response.WriteAsJsonAsync(response, cancellationToken);
