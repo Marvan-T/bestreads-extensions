@@ -32,7 +32,6 @@ public class GlobalExceptionHandlerIntegrationTests
         _client = _server.CreateClient();
     }
 
-
     [Fact]
     public async Task WhenExceptionOccurs_ThenReturnsInternalServerError()
     {
