@@ -1,8 +1,6 @@
 using BestReads;
 using BestReads.Infrastructure.Data;
 using Serilog;
-using Serilog.Events;
-using Serilog.Formatting.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -26,53 +24,7 @@ services.RegisterDependencies();
 services.AddDefaultAutoMapper();
 services.SetupRefit(builder.Configuration);
 
-builder.Host.UseSerilog(
-    (context, configuration) =>
-    {
-        configuration
-            .MinimumLevel.Information()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-            .MinimumLevel.Override("System", LogEventLevel.Warning)
-            .Enrich.FromLogContext();
-
-        if (context.HostingEnvironment.IsProduction())
-        {
-            try
-            {
-                configuration.WriteTo.AzureBlobStorage(
-                    connectionString: context.Configuration["AZURE_BLOB_STORAGE_CONNECTION_STRING"],
-                    storageContainerName: "best-reads-logs",
-                    storageFileName: "log-{yyyy}/{MM}/{dd}.json",
-                    formatter: new JsonFormatter(renderMessage: true, formatProvider: null)
-                );
-            }
-            catch (Exception ex)
-            {
-                // Fallback to stderr for Docker logging
-                configuration.WriteTo.Console(
-                    restrictedToMinimumLevel: LogEventLevel.Warning,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
-                );
-
-                // Log the configuration error
-                Console.Error.WriteLine(
-                    $"Failed to configure Azure Blob Storage logging: {ex.Message}"
-                );
-            }
-        }
-        else
-        {
-            configuration.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug);
-            configuration.WriteTo.File(
-                formatter: new JsonFormatter(renderMessage: true, formatProvider: null),
-                path: "./logs/log-.json",
-                rollingInterval: RollingInterval.Day,
-                rollOnFileSizeLimit: true,
-                restrictedToMinimumLevel: LogEventLevel.Verbose
-            );
-        }
-    }
-);
+builder.Host.SetupSerilog();
 
 var app = builder.Build();
 
