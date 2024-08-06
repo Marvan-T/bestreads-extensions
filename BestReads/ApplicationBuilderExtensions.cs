@@ -12,6 +12,9 @@ using BestReads.Infrastructure.AzureSearchClient;
 using BestReads.Infrastructure.Data;
 using MongoDB.Driver;
 using Refit;
+using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Json;
 
 namespace BestReads;
 
@@ -45,16 +48,76 @@ public static class ApplicationBuilderExtensions
         services.AddAutoMapper(typeof(Program).Assembly);
     }
 
-    public static void SetupMongoDB(this IServiceCollection services, MongoDbSettings mongoDbSettings)
+    public static void SetupMongoDB(
+        this IServiceCollection services,
+        MongoDbSettings mongoDbSettings
+    )
     {
-        services.AddSingleton<IMongoClient, MongoClient>(sp =>
-            new MongoClient(mongoDbSettings.ConnectionString));
+        services.AddSingleton<IMongoClient, MongoClient>(sp => new MongoClient(
+            mongoDbSettings.ConnectionString
+        ));
     }
 
     public static void SetupRefit(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddRefitClient<INYTimesApiClient>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(configuration["NYTimesApi:BaseAddress"]))
+        services
+            .AddRefitClient<INYTimesApiClient>()
+            .ConfigureHttpClient(c =>
+                c.BaseAddress = new Uri(configuration["NYTimesApi:BaseAddress"])
+            )
             .AddHttpMessageHandler<NyTimesAuthenticationDelegatingHandler>();
+    }
+
+    public static void SetupSerilog(this IHostBuilder hostBuilder)
+    {
+        hostBuilder.UseSerilog(
+            (context, configuration) =>
+            {
+                configuration
+                    .MinimumLevel.Information()
+                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                    .MinimumLevel.Override("System", LogEventLevel.Warning)
+                    .Enrich.FromLogContext();
+
+                if (context.HostingEnvironment.IsProduction())
+                {
+                    try
+                    {
+                        configuration.WriteTo.AzureBlobStorage(
+                            connectionString: context.Configuration[
+                                "AZURE_BLOB_STORAGE_CONNECTION_STRING"
+                            ],
+                            storageContainerName: "best-reads-logs",
+                            storageFileName: "log-{yyyy}/{MM}/{dd}.json",
+                            formatter: new JsonFormatter(renderMessage: true, formatProvider: null)
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        // Fallback to stderr for Docker logging
+                        configuration.WriteTo.Console(
+                            restrictedToMinimumLevel: LogEventLevel.Warning,
+                            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+                        );
+
+                        // Log the configuration error
+                        Console.Error.WriteLine(
+                            $"Failed to configure Azure Blob Storage logging: {ex.Message}"
+                        );
+                    }
+                }
+                else
+                {
+                    configuration.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug);
+                    configuration.WriteTo.File(
+                        formatter: new JsonFormatter(renderMessage: true, formatProvider: null),
+                        path: "./logs/log-.json",
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        restrictedToMinimumLevel: LogEventLevel.Verbose
+                    );
+                }
+            }
+        );
     }
 }

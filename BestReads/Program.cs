@@ -1,5 +1,6 @@
 using BestReads;
 using BestReads.Infrastructure.Data;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -23,6 +24,8 @@ services.RegisterDependencies();
 services.AddDefaultAutoMapper();
 services.SetupRefit(builder.Configuration);
 
+builder.Host.SetupSerilog();
+
 var app = builder.Build();
 
 // Initialize indexes
@@ -38,6 +41,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
