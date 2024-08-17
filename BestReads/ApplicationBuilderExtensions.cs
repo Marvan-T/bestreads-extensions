@@ -1,4 +1,5 @@
-﻿using BestReads.Core;
+﻿using BestReads.BackgroundServices;
+using BestReads.Core;
 using BestReads.Core.Data;
 using BestReads.Features.BestSellers.Services.BestSellersService;
 using BestReads.Features.BookRecommendations.Repository;
@@ -11,6 +12,7 @@ using BestReads.Infrastructure.ApiClients.NYTimes.Handlers;
 using BestReads.Infrastructure.AzureSearchClient;
 using BestReads.Infrastructure.Data;
 using MongoDB.Driver;
+using Quartz;
 using Refit;
 using Serilog;
 using Serilog.Events;
@@ -119,5 +121,28 @@ public static class ApplicationBuilderExtensions
                 }
             }
         );
+    }
+
+    public static void QuartzConfig(this IServiceCollection services)
+    {
+        services.AddQuartz(configure =>
+        {
+            var jobKey = new JobKey(nameof(BestSellersCachePopulationJob));
+
+            configure
+                .AddJob<BestSellersCachePopulationJob>(jobKey)
+                .AddTrigger(trigger =>
+                    trigger
+                        .ForJob(jobKey)
+                        .WithDailyTimeIntervalSchedule(
+                            6, // interval
+                            IntervalUnit.Hour, // interval unit
+                            schedule => // configuration action
+                                schedule
+                                    .OnEveryDay()
+                                    .StartingDailyAt(TimeOfDay.HourAndMinuteOfDay(0, 0))
+                        )
+                );
+        });
     }
 }
