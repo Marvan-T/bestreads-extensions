@@ -32,7 +32,8 @@
 				"dkundel.vscode-new-file",
 				"MurlocCra4ler.leap",
 				"aliasadidev.nugetpackagemanagergui",
-				"SonarSource.sonarlint-vscode"
+				"SonarSource.sonarlint-vscode",
+				"Continue.continue"
 			]
 		}
 	}
