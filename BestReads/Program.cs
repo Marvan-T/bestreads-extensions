@@ -23,6 +23,8 @@ services.RegisterInfrastructureDependencies();
 services.RegisterDependencies();
 services.AddDefaultAutoMapper();
 services.SetupRefit(builder.Configuration);
+services.QuartzConfig();
+services.SetupQuartzHostedService();
 
 builder.Host.SetupSerilog();
 

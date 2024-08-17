@@ -145,4 +145,12 @@ public static class ApplicationBuilderExtensions
                 );
         });
     }
+
+    public static void SetupQuartzHostedService(this IServiceCollection services)
+    {
+        services.AddQuartzHostedService(options =>
+        {
+            options.WaitForJobsToComplete = true;
+        });
+    }
 }
