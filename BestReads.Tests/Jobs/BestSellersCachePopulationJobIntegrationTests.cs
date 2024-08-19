@@ -3,83 +3,85 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quartz;
+using Moq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
+using BestReads.Infrastructure.ApiClients.NYTimes;
+using Quartz.Impl;
+
+
 
 public class BestSellersCachePopulationJobIntegrationTests
 {
-    [Fact]
-    public async Task BestSellersCachePopulationJob_ShouldBeScheduledAndExecuted()
-    {
-        var jobKey = new JobKey(nameof(BestSellersCachePopulationJob));
-        var hostBuilder = new HostBuilder().ConfigureServices(services =>
-        {
-            services.AddQuartz(q =>
-            {
-                q.AddJob<BestSellersCachePopulationJob>(opts =>
-                    opts.WithIdentity(jobKey).StoreDurably()
-                );
-            });
-
-            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-        });
-
-        using (var host = await hostBuilder.StartAsync())
-        {
-            var scheduler = host.Services.GetService<IScheduler>();
-
-            await scheduler.TriggerJob(jobKey);
-        }
-    }
-
     // [Fact]
     // public async Task BestSellersCachePopulationJob_ShouldBeScheduledAndExecuted()
     // {
-    //     // Arrange
     //     var jobKey = new JobKey(nameof(BestSellersCachePopulationJob));
-    //     var mockMemoryCache = new Mock<IMemoryCache>();
-    //     var mockLogger = new Mock<ILogger<BestSellersCachePopulationJob>>();
-    //     var mockNYTimesApiClient = new Mock<INYTimesApiClient>();
-
-    //     var hostBuilder = new HostBuilder().ConfigureServices(
-    //         (hostContext, services) =>
+    //     var hostBuilder = new HostBuilder().ConfigureServices(services =>
+    //     {
+    //         services.AddQuartz(q =>
     //         {
-    //             services.AddSingleton(mockMemoryCache.Object);
-    //             services.AddSingleton(mockLogger.Object);
-    //             services.AddSingleton(mockNYTimesApiClient.Object);
+    //             q.AddJob<BestSellersCachePopulationJob>(opts =>
+    //                 opts.WithIdentity(jobKey).StoreDurably()
+    //             );
+    //         });
 
-    //             services.AddQuartz(q =>
-    //             {
-    //                 q.UseMicrosoftDependencyInjectionJobFactory();
-    //                 q.AddJob<BestSellersCachePopulationJob>(opts =>
-    //                     opts.WithIdentity(jobKey).StoreDurably()
-    //                 );
-    //             });
-    //             services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-    //         }
-    //     );
+    //         services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+    //     });
 
-    //     // Act
     //     using (var host = await hostBuilder.StartAsync())
     //     {
-    //         var scheduler = host.Services.GetRequiredService<IScheduler>();
+    //         var scheduler = host.Services.GetService<IScheduler>();
+
     //         await scheduler.TriggerJob(jobKey);
-
-    //         // Allow some time for the job to execute
-    //         await Task.Delay(1000);
     //     }
-
-    //     // Assert
-    //     mockLogger.Verify(
-    //         x =>
-    //             x.Log(
-    //                 It.IsAny<LogLevel>(),
-    //                 It.IsAny<EventId>(),
-    //                 It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Executing job")),
-    //                 It.IsAny<Exception>(),
-    //                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
-    //             ),
-    //         Times.Once
-    //     );
-
-    //     mockNYTimesApiClient.Verify(x => x.GetCurrentBestSellersList(), Times.Once);
     // }
+
+      [Fact]
+    public async Task BestSellersCachePopulationJob_ShouldBeScheduledAndExecuted()
+    {
+        // Arrange
+        var jobKey = new JobKey(nameof(BestSellersCachePopulationJob));
+        var mockMemoryCache = new Mock<IMemoryCache>();
+        var mockLogger = new Mock<ILogger<BestSellersCachePopulationJob>>();
+        var mockNYTimesApiClient = new Mock<INYTimesApiClient>();
+
+        var hostBuilder = new HostBuilder().ConfigureServices((hostContext, services) =>
+        {
+            services.AddSingleton(mockMemoryCache.Object);
+            services.AddSingleton(mockLogger.Object);
+            services.AddSingleton(mockNYTimesApiClient.Object);
+
+            services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+                
+                // Add the job
+                q.AddJob<BestSellersCachePopulationJob>(opts => opts
+                    .WithIdentity(jobKey)
+                    .StoreDurably());
+                
+                // Add the trigger
+                q.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithIdentity($"{jobKey}-trigger")
+                    .StartNow());
+            });
+
+            services.AddQuartzHostedService(options =>
+            {
+                options.WaitForJobsToComplete = true;
+            });
+        });
+
+        // Act
+        using (var host = await hostBuilder.StartAsync())
+        {
+            // Wait for the host to fully start and the job to potentially execute
+            // await Task.Delay(150000); // Adjust this delay as needed
+        }
+
+        // Assert
+        mockNYTimesApiClient.Verify(x => x.GetCurrentBestSellersList(), Times.Once);
+    }
 }
