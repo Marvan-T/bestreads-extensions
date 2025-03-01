@@ -14,12 +14,6 @@ I am actively maintaining and improving a fork of the original project:
 
 - Fork Repository: [Best Reads Fork](https://github.com/Marvan-T/book-recommendations)
 
-## Deployment
-
-The project is deployed on Azure. You can visit the application using the following URL:
-
-- URL: [Best Reads](https://best-reads.today)
-
 ## Enhancements and Features
 
 Best Reads Extensions is built as an extra layer on top of the original project. It works as its own API, exposing new features to the original application.
